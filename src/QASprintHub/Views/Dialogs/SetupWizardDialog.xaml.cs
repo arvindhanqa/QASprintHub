@@ -16,7 +16,7 @@ public partial class SetupWizardDialog : Window
 
     public bool SetupCompleted { get; set; }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         if (DataContext is ViewModels.Dialogs.SetupWizardViewModel vm)
         {
