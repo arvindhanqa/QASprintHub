@@ -5,5 +5,6 @@ public enum PRStatus
     Pending,
     Merged,
     Blocked,
+    Closed,
     Declined
 }

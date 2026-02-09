@@ -79,7 +79,7 @@ public partial class SettingsViewModel : ObservableObject
             {
                 // Delete all planned (not started) sprints
                 var plannedSprints = await _context.Sprints
-                    .Where(s => s.Status == Models.Enums.SprintStatus.Planned)
+                    .Where(s => s.Status == Models.Enums.SprintStatus.Planning)
                     .ToListAsync();
 
                 _context.Sprints.RemoveRange(plannedSprints);

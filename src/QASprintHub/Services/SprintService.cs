@@ -201,7 +201,7 @@ public class SprintService : ISprintService
                     StartDate = nextStartDate,
                     EndDate = endDate,
                     WatcherId = watcherId,
-                    Status = SprintStatus.Planned,
+                    Status = SprintStatus.Planning,
                     CreatedDate = DateTime.Now
                 };
 
@@ -265,7 +265,7 @@ public class SprintService : ISprintService
 
         // Find planned sprints that should be active now
         var sprintsToActivate = await _context.Sprints
-            .Where(s => s.Status == SprintStatus.Planned && s.StartDate <= today && s.EndDate >= today)
+            .Where(s => s.Status == SprintStatus.Planning && s.StartDate <= today && s.EndDate >= today)
             .ToListAsync();
 
         // Activate them
