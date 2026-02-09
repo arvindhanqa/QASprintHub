@@ -89,14 +89,6 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    private void NavigationView_ItemInvoked(object sender, RoutedEventArgs e)
-    {
-        if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
-        {
-            NavigateTo(tag);
-        }
-    }
-
     private void NavigateTo(string page)
     {
         try
