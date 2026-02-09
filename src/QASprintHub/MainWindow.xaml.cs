@@ -34,14 +34,6 @@ public partial class MainWindow : Window
 
         // Set up navigation
         NavigationView.SelectionChanged += NavigationView_SelectionChanged;
-        // Ensure clicking menu items also navigates
-        NavigationView.ItemInvoked += (s, e) =>
-        {
-            if (e.InvokedItem is NavigationViewItem item && item.Tag is string tag)
-            {
-                NavigateTo(tag);
-            }
-        };
 
         // Set up tray service events
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
@@ -80,7 +72,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void NavigationView_SelectionChanged(NavigationView sender, RoutedEventArgs args)
+    private void NavigationView_SelectionChanged(object sender, RoutedEventArgs e)
     {
         if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
         {
