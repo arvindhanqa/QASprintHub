@@ -174,8 +174,6 @@ public partial class CalendarDiaryViewModel : ObservableObject
 
     private async Task LoadDayNotesAsync()
     {
-        if (SelectedDate == null) return;
-
         var dayNote = await _context.DayNotes
             .FirstOrDefaultAsync(n => n.Date.Date == SelectedDate.Date);
 
@@ -185,8 +183,6 @@ public partial class CalendarDiaryViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveDayNotesAsync()
     {
-        if (SelectedDate == null) return;
-
         var dayNote = await _context.DayNotes
             .FirstOrDefaultAsync(n => n.Date.Date == SelectedDate.Date);
 

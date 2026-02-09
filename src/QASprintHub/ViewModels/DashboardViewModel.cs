@@ -104,7 +104,7 @@ public partial class DashboardViewModel : ObservableObject
         {
             await _watcherService.SwapWatcherAsync(CurrentSprint.Id, CurrentWatcher.Id, dialog.SelectedMember.Id, dialog.Reason);
             await LoadDataAsync();
-            _notificationService.ShowWatcherNotification(CurrentSprint, NextWatcher?.Name);
+            _notificationService.ShowWatcherNotification(CurrentSprint, NextWatcher);
         }
     }
 

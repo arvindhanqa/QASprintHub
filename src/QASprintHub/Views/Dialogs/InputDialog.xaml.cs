@@ -24,7 +24,7 @@ public partial class InputDialog : Window, INotifyPropertyChanged
         InputValue = defaultValue;
     }
 
-    public string Title
+    public new string Title
     {
         get => _title;
         set { _title = value; OnPropertyChanged(); }

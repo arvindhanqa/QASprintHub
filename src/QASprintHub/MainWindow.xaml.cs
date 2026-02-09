@@ -145,7 +145,7 @@ public partial class MainWindow : Window
                     var settingsView = _serviceProvider.GetRequiredService<SettingsView>();
                     var settingsViewModel = _serviceProvider.GetRequiredService<SettingsViewModel>();
                     settingsView.DataContext = settingsViewModel;
-                    settingsViewModel.LoadSettings();
+                    _ = settingsViewModel.LoadSettingsAsync();
                     ContentFrame.Navigate(settingsView);
                     break;
             }
