@@ -26,13 +26,11 @@ public partial class AssignBackupDialog : Window
 
         WasConfirmed = true;
         DialogResult = true;
-        Close();
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
         WasConfirmed = false;
         DialogResult = false;
-        Close();
     }
 }

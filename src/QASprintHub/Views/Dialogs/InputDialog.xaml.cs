@@ -47,13 +47,13 @@ public partial class InputDialog : Window, INotifyPropertyChanged
     private void OK_Click(object sender, RoutedEventArgs e)
     {
         WasConfirmed = true;
-        Close();
+        DialogResult = true;
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
         WasConfirmed = false;
-        Close();
+        DialogResult = false;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
