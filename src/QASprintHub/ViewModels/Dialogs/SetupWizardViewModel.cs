@@ -1,11 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using QASprintHub.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace QASprintHub.ViewModels.Dialogs;
+
+public partial class TeamMemberInput : ObservableObject
+{
+    [ObservableProperty]
+    private string _name = string.Empty;
+}
 
 public partial class SetupWizardViewModel : ObservableObject
 {
@@ -25,7 +32,7 @@ public partial class SetupWizardViewModel : ObservableObject
     private int _teamSize = 7;
 
     [ObservableProperty]
-    private ObservableCollection<string> _teamMemberNames = new();
+    private ObservableCollection<TeamMemberInput> _teamMemberNames = new();
 
     [ObservableProperty]
     private bool _isComplete = false;
@@ -45,16 +52,31 @@ public partial class SetupWizardViewModel : ObservableObject
         // Persist app settings and initial sprint configuration
         try
         {
-            var settings = new QASprintHub.Models.AppSettings
-            {
-                SprintDurationDays = SprintDurationDays,
-                FirstSprintStartDate = FirstSprintStartDate,
-                IsConfigured = true,
-                LastModified = DateTime.Now
-            };
-            // Save via DbContext
             var db = App.GetService<QASprintHub.Data.AppDbContext>();
-            db.AppSettings.Add(settings);
+            var settings = await db.AppSettings.FirstOrDefaultAsync();
+
+            if (settings == null)
+            {
+                // Create new settings
+                settings = new QASprintHub.Models.AppSettings
+                {
+                    SprintDurationDays = SprintDurationDays,
+                    FirstSprintStartDate = FirstSprintStartDate,
+                    IsConfigured = true,
+                    CreatedDate = DateTime.Now,
+                    LastModified = DateTime.Now
+                };
+                db.AppSettings.Add(settings);
+            }
+            else
+            {
+                // Update existing settings
+                settings.SprintDurationDays = SprintDurationDays;
+                settings.FirstSprintStartDate = FirstSprintStartDate;
+                settings.IsConfigured = true;
+                settings.LastModified = DateTime.Now;
+            }
+
             await db.SaveChangesAsync();
         }
         catch
@@ -77,7 +99,7 @@ public partial class SetupWizardViewModel : ObservableObject
             // Add new members
             for (int i = currentCount; i < TeamSize; i++)
             {
-                TeamMemberNames.Add($"Team Member {i + 1}");
+                TeamMemberNames.Add(new TeamMemberInput { Name = $"Team Member {i + 1}" });
             }
         }
         else if (TeamSize < currentCount)
@@ -116,9 +138,9 @@ public partial class SetupWizardViewModel : ObservableObject
             // Add team members
             for (int i = 0; i < TeamMemberNames.Count; i++)
             {
-                if (!string.IsNullOrWhiteSpace(TeamMemberNames[i]))
+                if (!string.IsNullOrWhiteSpace(TeamMemberNames[i].Name))
                 {
-                    await _teamService.AddMemberAsync(TeamMemberNames[i]);
+                    await _teamService.AddMemberAsync(TeamMemberNames[i].Name);
                 }
             }
 
