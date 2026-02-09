@@ -64,13 +64,11 @@ public partial class AddPRDialog : Window
 
         WasConfirmed = true;
         DialogResult = true;
-        Close();
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
         WasConfirmed = false;
         DialogResult = false;
-        Close();
     }
 }

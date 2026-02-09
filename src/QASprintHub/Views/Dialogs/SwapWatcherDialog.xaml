@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         Title="Swap QA Watcher"
-        Height="450" Width="500"
+        Height="500" Width="500"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize"
-        WindowStyle="None"
+        ResizeMode="CanResize"
         Background="White">
     <Grid Margin="20">
         <Grid.RowDefinitions>
