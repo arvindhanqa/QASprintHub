@@ -51,15 +51,12 @@ public partial class SprintPRsViewModel : ObservableObject
         var dialog = new Views.Dialogs.AddPRDialog();
         if (dialog.ShowDialog() == true)
         {
-            await _prService.AddPRAsync(new Models.SprintPR
-            {
-                SprintId = CurrentSprint.Id,
-                Title = dialog.PRTitle,
-                Author = dialog.Author,
-                Status = dialog.Status,
-                Priority = dialog.Priority,
-                CreatedDate = System.DateTime.Now
-            });
+            await _prService.AddPRAsync(
+                CurrentSprint.Id,
+                dialog.PRTitle,
+                null, // link
+                dialog.Author,
+                dialog.Priority);
             await LoadDataAsync();
         }
     }

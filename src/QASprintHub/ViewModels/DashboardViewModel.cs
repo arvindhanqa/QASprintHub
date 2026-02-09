@@ -102,7 +102,7 @@ public partial class DashboardViewModel : ObservableObject
         var dialog = new Views.Dialogs.SwapWatcherDialog(CurrentWatcher.Name, availableMembers);
         if (dialog.ShowDialog() == true && dialog.SelectedMember != null)
         {
-            await _watcherService.SwapWatcherAsync(CurrentSprint.Id, dialog.SelectedMember.Id, dialog.Reason);
+            await _watcherService.SwapWatcherAsync(CurrentSprint.Id, CurrentWatcher.Id, dialog.SelectedMember.Id, dialog.Reason);
             await LoadDataAsync();
             _notificationService.ShowWatcherNotification(CurrentSprint, NextWatcher?.Name);
         }
@@ -120,7 +120,12 @@ public partial class DashboardViewModel : ObservableObject
         var dialog = new Views.Dialogs.AssignBackupDialog(availableMembers);
         if (dialog.ShowDialog() == true && dialog.SelectedMember != null)
         {
-            await _watcherService.AssignBackupWatcherAsync(CurrentSprint.Id, dialog.SelectedMember.Id);
+            await _watcherService.AssignBackupWatcherAsync(
+                CurrentSprint.Id,
+                dialog.SelectedMember.Id,
+                CurrentSprint.StartDate,
+                CurrentSprint.EndDate,
+                Models.Enums.CoverageType.FullSprint);
             await LoadDataAsync();
         }
     }

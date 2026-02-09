@@ -72,7 +72,8 @@ public partial class WatcherManagementViewModel : ObservableObject
         var dialog = new Views.Dialogs.InputDialog("Edit Team Member", "Enter new name:", member.Name);
         if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputValue))
         {
-            await _teamService.UpdateMemberNameAsync(member.Id, dialog.InputValue);
+            member.Name = dialog.InputValue;
+            await _teamService.UpdateMemberAsync(member);
             await LoadDataAsync();
         }
     }
