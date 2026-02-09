@@ -8,6 +8,10 @@
              d:DesignHeight="600" d:DesignWidth="800">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="20">
+            <!-- Save Button -->
+            <ui:Button Content="Save Settings" Command="{Binding SaveSettingsCommand}"
+                      Appearance="Primary" Margin="0,0,0,20" HorizontalAlignment="Left" Padding="30,10"/>
+
             <!-- Sprint Defaults -->
             <GroupBox Header="SPRINT DEFAULTS" Margin="0,0,0,20">
                 <StackPanel Margin="10">

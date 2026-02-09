@@ -41,7 +41,7 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <!-- Notification Icon -->
-                <Button Grid.Column="2" Content="🔔" Padding="10,5"/>
+                <Button Grid.Column="2" Content="🔔" Padding="10,5" Click="NotificationBell_Click" ToolTip="View Notifications"/>
             </Grid>
         </Border>
 
