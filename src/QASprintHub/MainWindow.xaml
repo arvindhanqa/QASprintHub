@@ -1,14 +1,13 @@
-<ui:FluentWindow x:Class="QASprintHub.MainWindow"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 mc:Ignorable="d"
-                 Title="QA Sprint Hub"
-                 Height="700" Width="1200"
-                 ResizeMode="CanResize" WindowStyle="SingleBorderWindow" ShowInTaskbar="True"
-                 WindowStartupLocation="CenterScreen">
+<Window x:Class="QASprintHub.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="QA Sprint Hub"
+        Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -77,4 +76,4 @@
             <Frame x:Name="ContentFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>
-</ui:FluentWindow>
+</Window>
