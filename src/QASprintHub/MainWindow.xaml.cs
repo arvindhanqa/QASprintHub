@@ -35,11 +35,42 @@ public partial class MainWindow : Window
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
         _trayService.ExitRequested += (s, e) => ExitApplication();
 
+        // Set up navigation click handlers
+        SetupNavigation();
+
         // Navigate to Calendar Diary by default
         NavigateTo("CalendarDiary");
 
         // Show current watcher notification on startup
         _ = ShowStartupNotificationAsync();
+    }
+
+    private void SetupNavigation()
+    {
+        // Attach click handlers to all navigation items
+        foreach (var item in NavigationView.MenuItems)
+        {
+            if (item is Wpf.Ui.Controls.NavigationViewItem navItem)
+            {
+                navItem.Click += NavigationItem_Click;
+            }
+        }
+
+        foreach (var item in NavigationView.FooterMenuItems)
+        {
+            if (item is Wpf.Ui.Controls.NavigationViewItem navItem)
+            {
+                navItem.Click += NavigationItem_Click;
+            }
+        }
+    }
+
+    private void NavigationItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Wpf.Ui.Controls.NavigationViewItem item && item.Tag is string tag)
+        {
+            NavigateTo(tag);
+        }
     }
 
     private async System.Threading.Tasks.Task ShowStartupNotificationAsync()
@@ -61,14 +92,6 @@ public partial class MainWindow : Window
             // Log error (in production, use a proper logging framework)
             System.Windows.MessageBox.Show($"Error loading sprint information: {ex.Message}", "Error",
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-        }
-    }
-
-    private void NavigationView_SelectionChanged(object sender, RoutedEventArgs e)
-    {
-        if (NavigationView.SelectedItem is Wpf.Ui.Controls.NavigationViewItem item && item.Tag is string tag)
-        {
-            NavigateTo(tag);
         }
     }
 
