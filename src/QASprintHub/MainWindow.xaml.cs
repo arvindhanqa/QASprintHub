@@ -8,7 +8,7 @@ using Wpf.Ui.Controls;
 
 namespace QASprintHub;
 
-public partial class MainWindow : FluentWindow
+public partial class MainWindow : Window
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ITrayService _trayService;
@@ -24,11 +24,6 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
 
-        // Allow normal window chrome behavior
-        this.ResizeMode = System.Windows.ResizeMode.CanResize;
-        this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
-        this.ShowInTaskbar = true;
-
         _serviceProvider = serviceProvider;
         _trayService = trayService;
         _notificationService = notificationService;
@@ -42,7 +37,7 @@ public partial class MainWindow : FluentWindow
         // Ensure clicking menu items also navigates
         NavigationView.ItemInvoked += (s, e) =>
         {
-            if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+            if (e.InvokedItem is NavigationViewItem item && item.Tag is string tag)
             {
                 NavigateTo(tag);
             }
@@ -52,7 +47,11 @@ public partial class MainWindow : FluentWindow
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
         _trayService.ExitRequested += (s, e) => ExitApplication();
 
-        // Navigate to Calendar Diary by default
+        // Select first menu item and navigate to Calendar Diary by default
+        if (NavigationView.MenuItems.Count > 0 && NavigationView.MenuItems[0] is NavigationViewItem firstItem)
+        {
+            NavigationView.SelectedItem = firstItem;
+        }
         NavigateTo("CalendarDiary");
 
         // Show current watcher notification on startup
