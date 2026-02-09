@@ -8,7 +8,7 @@ using Wpf.Ui.Controls;
 
 namespace QASprintHub;
 
-public partial class MainWindow : Window
+public partial class MainWindow : System.Windows.Window
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ITrayService _trayService;
@@ -31,9 +31,6 @@ public partial class MainWindow : Window
 
         _currentMonth = DateTime.Today;
         UpdateMonthDisplay();
-
-        // Set up navigation
-        NavigationView.SelectionChanged += NavigationView_SelectionChanged;
 
         // Set up tray service events
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
