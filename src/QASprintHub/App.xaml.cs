@@ -8,6 +8,7 @@ using QASprintHub.Views;
 using System;
 using Microsoft.Win32;
 using System.IO;
+using System.Threading;
 using System.Windows;
 
 namespace QASprintHub;
@@ -15,6 +16,7 @@ namespace QASprintHub;
 public partial class App : Application
 {
     private readonly IHost _host;
+    private static Mutex? _instanceMutex;
 
     public App()
     {
@@ -73,6 +75,21 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        // Single instance check
+        bool createdNew;
+        _instanceMutex = new Mutex(true, "QASprintHub_SingleInstanceMutex", out createdNew);
+
+        if (!createdNew)
+        {
+            // Another instance is already running
+            MessageBox.Show("QA Sprint Hub is already running. Check the system tray.",
+                "Already Running",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            Shutdown();
+            return;
+        }
+
         await _host.StartAsync();
 
         // Ensure database is created
@@ -189,6 +206,10 @@ public partial class App : Application
 
         await _host.StopAsync();
         _host.Dispose();
+
+        // Release single instance mutex
+        _instanceMutex?.ReleaseMutex();
+        _instanceMutex?.Dispose();
 
         base.OnExit(e);
     }
