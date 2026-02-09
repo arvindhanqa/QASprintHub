@@ -8,7 +8,7 @@ using Wpf.Ui.Controls;
 
 namespace QASprintHub;
 
-public partial class MainWindow : Window
+public partial class MainWindow : System.Windows.Window
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ITrayService _trayService;
