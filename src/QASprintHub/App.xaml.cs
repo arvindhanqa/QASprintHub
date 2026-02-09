@@ -149,6 +149,22 @@ public partial class App : Application
             }
         }
 
+        // Activate planned sprints and generate future sprints if needed
+        var sprintService = _host.Services.GetRequiredService<ISprintService>();
+        try
+        {
+            // Activate any planned sprints that should be active now
+            await sprintService.ActivatePlannedSprintsAsync();
+
+            // Generate future sprints (6 months ahead)
+            await sprintService.GenerateFutureSprintsAsync(6);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error managing sprints: {ex.Message}", "Startup Warning",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        }
+
         // Initialize tray service
         var trayService = _host.Services.GetRequiredService<ITrayService>();
         try
