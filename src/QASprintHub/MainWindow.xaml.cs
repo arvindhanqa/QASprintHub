@@ -39,8 +39,8 @@ public partial class MainWindow : FluentWindow
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
         _trayService.ExitRequested += (s, e) => ExitApplication();
 
-        // Navigate to Dashboard by default
-        NavigateTo("Dashboard");
+        // Navigate to Calendar Diary by default
+        NavigateTo("CalendarDiary");
 
         // Show current watcher notification on startup
         _ = ShowStartupNotificationAsync();
@@ -82,6 +82,14 @@ public partial class MainWindow : FluentWindow
         {
             switch (page)
             {
+                case "CalendarDiary":
+                    var calendarView = _serviceProvider.GetRequiredService<CalendarDiaryView>();
+                    var calendarViewModel = _serviceProvider.GetRequiredService<CalendarDiaryViewModel>();
+                    calendarView.DataContext = calendarViewModel;
+                    _ = calendarViewModel.LoadDataAsync();
+                    ContentFrame.Navigate(calendarView);
+                    break;
+
                 case "Dashboard":
                     var dashboardView = _serviceProvider.GetRequiredService<DashboardView>();
                     var dashboardViewModel = _serviceProvider.GetRequiredService<DashboardViewModel>();
@@ -151,6 +159,24 @@ public partial class MainWindow : FluentWindow
     private void UpdateMonthDisplay()
     {
         MonthYearText.Text = _currentMonth.ToString("MMMM yyyy");
+        CalendarDatePicker.SelectedDate = _currentMonth;
+    }
+
+    private async void CalendarDatePicker_SelectedDateChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (CalendarDatePicker.SelectedDate.HasValue)
+        {
+            var selectedDate = CalendarDatePicker.SelectedDate.Value;
+            _currentMonth = selectedDate;
+            UpdateMonthDisplay();
+
+            // If we're on the Calendar Diary view, navigate to the selected date
+            if (ContentFrame.Content is CalendarDiaryView calendarView &&
+                calendarView.DataContext is CalendarDiaryViewModel viewModel)
+            {
+                await viewModel.GoToDateAsync(selectedDate);
+            }
+        }
     }
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
