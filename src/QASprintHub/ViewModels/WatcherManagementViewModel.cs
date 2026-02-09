@@ -56,16 +56,25 @@ public partial class WatcherManagementViewModel : ObservableObject
     [RelayCommand]
     private async Task AddMemberAsync()
     {
-        // TODO: Open add member dialog
-        await Task.CompletedTask;
+        var dialog = new Views.Dialogs.InputDialog("Add Team Member", "Enter member name:", "");
+        if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputValue))
+        {
+            await _teamService.AddMemberAsync(dialog.InputValue);
+            await LoadDataAsync();
+        }
     }
 
     [RelayCommand]
     private async Task EditMemberAsync(TeamMember? member)
     {
         if (member == null) return;
-        // TODO: Open edit member dialog
-        await Task.CompletedTask;
+
+        var dialog = new Views.Dialogs.InputDialog("Edit Team Member", "Enter new name:", member.Name);
+        if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputValue))
+        {
+            await _teamService.UpdateMemberNameAsync(member.Id, dialog.InputValue);
+            await LoadDataAsync();
+        }
     }
 
     [RelayCommand]

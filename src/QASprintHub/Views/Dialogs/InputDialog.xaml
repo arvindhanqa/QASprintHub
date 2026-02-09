@@ -1,0 +1,35 @@
+<Window x:Class="QASprintHub.Views.Dialogs.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Title="{Binding Title}"
+        Height="200" Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Background="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+        <!-- Prompt -->
+        <TextBlock Grid.Row="1" Text="{Binding Prompt}" Margin="0,0,0,10"/>
+
+        <!-- Input -->
+        <TextBox Grid.Row="2" x:Name="InputTextBox" Text="{Binding InputValue, UpdateSourceTrigger=PropertyChanged}"
+                 VerticalAlignment="Top" Padding="8" FontSize="14"/>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <ui:Button Content="Cancel" Appearance="Secondary" Click="Cancel_Click" Margin="0,0,10,0" Padding="20,8"/>
+            <ui:Button Content="OK" Appearance="Primary" Click="OK_Click" Padding="20,8"/>
+        </StackPanel>
+    </Grid>
+</Window>
