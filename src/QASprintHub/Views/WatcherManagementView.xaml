@@ -1,0 +1,61 @@
+<UserControl x:Class="QASprintHub.Views.WatcherManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Rotation Order -->
+        <GroupBox Header="ROTATION ORDER" Grid.Column="0" Margin="0,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <ListBox Grid.Row="0" ItemsSource="{Binding ActiveMembers}"
+                         SelectedItem="{Binding SelectedMember}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding RotationOrder}" Width="30" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Name}" Margin="10,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+                    <ui:Button Content="↑ Up" Command="{Binding MoveUpCommand}"
+                              CommandParameter="{Binding SelectedMember}" Margin="0,0,5,0"/>
+                    <ui:Button Content="↓ Down" Command="{Binding MoveDownCommand}"
+                              CommandParameter="{Binding SelectedMember}" Margin="0,0,5,0"/>
+                    <ui:Button Content="+ Add Member" Command="{Binding AddMemberCommand}" Margin="0,0,5,0"/>
+                    <ui:Button Content="x Remove" Command="{Binding DeactivateMemberCommand}"
+                              CommandParameter="{Binding SelectedMember}"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- Swap History -->
+        <GroupBox Header="SWAP HISTORY" Grid.Column="1" Margin="10,0,0,0">
+            <DataGrid ItemsSource="{Binding SwapHistory}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Sprint" Binding="{Binding Sprint.DisplayName}" Width="*"/>
+                    <DataGridTextColumn Header="Scheduled" Binding="{Binding ScheduledWatcher.Name}" Width="*"/>
+                    <DataGridTextColumn Header="Actual" Binding="{Binding ActualWatcher.Name}" Width="*"/>
+                    <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

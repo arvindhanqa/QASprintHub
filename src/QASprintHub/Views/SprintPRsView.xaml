@@ -1,0 +1,59 @@
+<UserControl x:Class="QASprintHub.Views.SprintPRsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="{Binding CurrentSprint.DisplayName, StringFormat='Sprint PRs — {0}'}"
+                       FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+            <ui:Button Content="+ Add PR" Command="{Binding AddPRCommand}" Margin="0,0,10,0"/>
+        </StackPanel>
+
+        <!-- PR List -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding PRs}"
+                  SelectedItem="{Binding SelectedPR}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*"/>
+                <DataGridTextColumn Header="Author" Binding="{Binding Author}" Width="150"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Selected PR Details -->
+        <GroupBox Grid.Row="2" Header="Selected PR Details" Margin="10"
+                  Visibility="{Binding SelectedPR, Converter={StaticResource NullToVisibilityConverter}}">
+            <StackPanel Margin="10">
+                <TextBlock Text="{Binding SelectedPR.Title, StringFormat='Title: {0}'}" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedPR.Link, StringFormat='Link: {0}'}" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedPR.Author, StringFormat='Author: {0}'}" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedPR.Status, StringFormat='Status: {0}'}" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedPR.Priority, StringFormat='Priority: {0}'}" Margin="0,0,0,5"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <ui:Button Content="Open Link" Command="{Binding OpenLinkCommand}"
+                              CommandParameter="{Binding SelectedPR}" Margin="0,0,10,0"/>
+                    <ui:Button Content="Edit" Command="{Binding EditPRCommand}"
+                              CommandParameter="{Binding SelectedPR}" Margin="0,0,10,0"/>
+                    <ui:Button Content="Delete" Command="{Binding DeletePRCommand}"
+                              CommandParameter="{Binding SelectedPR}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>
