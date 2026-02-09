@@ -4,11 +4,10 @@ using QASprintHub.ViewModels;
 using QASprintHub.Views;
 using System;
 using System.Windows;
-using Wpf.Ui.Controls;
 
 namespace QASprintHub;
 
-public partial class MainWindow : System.Windows.Window
+public partial class MainWindow : Window
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ITrayService _trayService;
@@ -37,7 +36,7 @@ public partial class MainWindow : System.Windows.Window
         _trayService.ExitRequested += (s, e) => ExitApplication();
 
         // Select first menu item and navigate to Calendar Diary by default
-        if (NavigationView.MenuItems.Count > 0 && NavigationView.MenuItems[0] is NavigationViewItem firstItem)
+        if (NavigationView.MenuItems.Count > 0 && NavigationView.MenuItems[0] is Wpf.Ui.Controls.NavigationViewItem firstItem)
         {
             NavigationView.SelectedItem = firstItem;
         }
@@ -71,7 +70,7 @@ public partial class MainWindow : System.Windows.Window
 
     private void NavigationView_SelectionChanged(object sender, RoutedEventArgs e)
     {
-        if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+        if (NavigationView.SelectedItem is Wpf.Ui.Controls.NavigationViewItem item && item.Tag is string tag)
         {
             NavigateTo(tag);
         }
