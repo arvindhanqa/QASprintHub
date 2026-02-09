@@ -35,11 +35,7 @@ public partial class MainWindow : Window
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
         _trayService.ExitRequested += (s, e) => ExitApplication();
 
-        // Select first menu item and navigate to Calendar Diary by default
-        if (NavigationView.MenuItems.Count > 0 && NavigationView.MenuItems[0] is Wpf.Ui.Controls.NavigationViewItem firstItem)
-        {
-            NavigationView.SelectedItem = firstItem;
-        }
+        // Navigate to Calendar Diary by default
         NavigateTo("CalendarDiary");
 
         // Show current watcher notification on startup
