@@ -44,6 +44,8 @@ public partial class App : Application
                 services.AddTransient<WatcherManagementViewModel>();
                 services.AddTransient<HistoryViewModel>();
                 services.AddTransient<SettingsViewModel>();
+                services.AddTransient<CalendarDiaryViewModel>();
+                services.AddTransient<ViewModels.Dialogs.SetupWizardViewModel>();
 
                 // Views
                 services.AddTransient<DashboardView>();
@@ -51,6 +53,8 @@ public partial class App : Application
                 services.AddTransient<WatcherManagementView>();
                 services.AddTransient<HistoryView>();
                 services.AddTransient<SettingsView>();
+                services.AddTransient<CalendarDiaryView>();
+                services.AddTransient<Views.Dialogs.SetupWizardDialog>();
 
                 // Main Window
                 services.AddSingleton<MainWindow>();
@@ -65,6 +69,27 @@ public partial class App : Application
         // Ensure database is created
         var dbContext = _host.Services.GetRequiredService<AppDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
+
+        // Check if setup is needed
+        var teamService = _host.Services.GetRequiredService<ITeamService>();
+        var activeMembers = await teamService.GetActiveMembersAsync();
+
+        if (activeMembers.Count == 0)
+        {
+            // Show setup wizard for first-time users
+            var setupWizard = _host.Services.GetRequiredService<Views.Dialogs.SetupWizardDialog>();
+            var setupViewModel = _host.Services.GetRequiredService<ViewModels.Dialogs.SetupWizardViewModel>();
+            setupWizard.DataContext = setupViewModel;
+
+            setupWizard.ShowDialog();
+
+            if (!setupWizard.SetupCompleted)
+            {
+                // User cancelled setup, exit application
+                Shutdown();
+                return;
+            }
+        }
 
         // Initialize tray service
         var trayService = _host.Services.GetRequiredService<ITrayService>();

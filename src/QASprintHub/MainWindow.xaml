@@ -23,8 +23,12 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Month Navigation -->
+                <!-- Date Navigation with Calendar Picker -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <DatePicker x:Name="CalendarDatePicker"
+                               SelectedDate="{Binding ElementName=MonthYearText, Path=Tag, Mode=TwoWay}"
+                               SelectedDateChanged="CalendarDatePicker_SelectedDateChanged"
+                               Margin="0,0,10,0" Width="120"/>
                     <Button Content="◄" Click="PreviousMonth_Click" Padding="10,5" Margin="0,0,10,0"/>
                     <TextBlock x:Name="MonthYearText" Text="February 2026" FontSize="16" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -56,6 +60,7 @@
                                    OpenPaneLength="200"
                                    PaneDisplayMode="Left">
                     <ui:NavigationView.MenuItems>
+                        <ui:NavigationViewItem Content="Sprint Diary" Icon="{ui:SymbolIcon Calendar24}" Tag="CalendarDiary"/>
                         <ui:NavigationViewItem Content="Dashboard" Icon="{ui:SymbolIcon Home24}" Tag="Dashboard"/>
                         <ui:NavigationViewItem Content="Sprint PRs" Icon="{ui:SymbolIcon DocumentBulletList24}" Tag="SprintPRs"/>
                         <ui:NavigationViewItem Content="Watchers" Icon="{ui:SymbolIcon People24}" Tag="Watchers"/>
