@@ -32,9 +32,6 @@ public partial class MainWindow : Window
         _currentMonth = DateTime.Today;
         UpdateMonthDisplay();
 
-        // Set up navigation
-        NavigationView.SelectionChanged += NavigationView_SelectionChanged;
-
         // Set up tray service events
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
         _trayService.ExitRequested += (s, e) => ExitApplication();
