@@ -58,8 +58,7 @@
                                    IsBackButtonVisible="Collapsed"
                                    IsPaneToggleVisible="False"
                                    OpenPaneLength="200"
-                                   PaneDisplayMode="Left"
-                                   SelectionChanged="NavigationView_SelectionChanged">
+                                   PaneDisplayMode="Left">
                     <ui:NavigationView.MenuItems>
                         <ui:NavigationViewItem Content="Sprint Diary" Icon="{ui:SymbolIcon Calendar24}" Tag="CalendarDiary"/>
                         <ui:NavigationViewItem Content="Dashboard" Icon="{ui:SymbolIcon Home24}" Tag="Dashboard"/>
