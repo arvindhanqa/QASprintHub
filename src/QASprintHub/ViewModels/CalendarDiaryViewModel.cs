@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using QASprintHub.Data;
 using QASprintHub.Models;
 using QASprintHub.Services;
 using System;
@@ -14,6 +16,7 @@ public partial class CalendarDiaryViewModel : ObservableObject
     private readonly ISprintService _sprintService;
     private readonly IPRService _prService;
     private readonly IWatcherService _watcherService;
+    private readonly AppDbContext _context;
 
     [ObservableProperty]
     private DateTime _selectedDate = DateTime.Today;
@@ -42,11 +45,13 @@ public partial class CalendarDiaryViewModel : ObservableObject
     public CalendarDiaryViewModel(
         ISprintService sprintService,
         IPRService prService,
-        IWatcherService watcherService)
+        IWatcherService watcherService,
+        AppDbContext context)
     {
         _sprintService = sprintService;
         _prService = prService;
         _watcherService = watcherService;
+        _context = context;
     }
 
     public async Task LoadDataAsync()
@@ -75,6 +80,9 @@ public partial class CalendarDiaryViewModel : ObservableObject
 
             // Select the current date if it's in this sprint
             SelectedDay = SprintDays.FirstOrDefault(d => d.Date.Date == date.Date);
+
+            // Load notes for the selected day
+            await LoadDayNotesAsync();
         }
         else
         {
@@ -126,6 +134,9 @@ public partial class CalendarDiaryViewModel : ObservableObject
         {
             d.IsSelected = d.Date.Date == day.Date.Date;
         }
+
+        // Load notes for this day
+        await LoadDayNotesAsync();
     }
 
     [RelayCommand]
@@ -161,15 +172,44 @@ public partial class CalendarDiaryViewModel : ObservableObject
         await GoToDateAsync(DateTime.Today);
     }
 
+    private async Task LoadDayNotesAsync()
+    {
+        if (SelectedDate == null) return;
+
+        var dayNote = await _context.DayNotes
+            .FirstOrDefaultAsync(n => n.Date.Date == SelectedDate.Date);
+
+        DayNotes = dayNote?.Notes ?? string.Empty;
+    }
+
     [RelayCommand]
     private async Task SaveDayNotesAsync()
     {
-        if (CurrentSprint == null) return;
+        if (SelectedDate == null) return;
 
-        // TODO: Implement day notes storage
-        // For now, we'll add it to sprint notes
-        CurrentSprint.Notes = DayNotes;
-        await _sprintService.UpdateSprintAsync(CurrentSprint);
+        var dayNote = await _context.DayNotes
+            .FirstOrDefaultAsync(n => n.Date.Date == SelectedDate.Date);
+
+        if (dayNote == null)
+        {
+            // Create new day note
+            dayNote = new DayNote
+            {
+                Date = SelectedDate.Date,
+                Notes = DayNotes,
+                CreatedDate = DateTime.Now,
+                LastModified = DateTime.Now
+            };
+            _context.DayNotes.Add(dayNote);
+        }
+        else
+        {
+            // Update existing day note
+            dayNote.Notes = DayNotes;
+            dayNote.LastModified = DateTime.Now;
+        }
+
+        await _context.SaveChangesAsync();
     }
 }
 

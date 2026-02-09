@@ -198,6 +198,36 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void NotificationBell_Click(object sender, RoutedEventArgs e)
+    {
+        // Get current and next sprint info
+        var currentSprint = await _sprintService.GetCurrentSprintAsync();
+        var nextSprint = await _sprintService.GetNextSprintAsync();
+
+        var message = "📋 Notifications:\n\n";
+
+        if (currentSprint != null)
+        {
+            message += $"✓ Current Sprint: {currentSprint.DisplayName}\n";
+            message += $"  QA Watcher: {currentSprint.Watcher?.Name ?? "None"}\n";
+            message += $"  Days remaining: {(currentSprint.EndDate - DateTime.Today).Days}\n\n";
+        }
+
+        if (nextSprint != null)
+        {
+            message += $"→ Next Sprint: {nextSprint.DisplayName}\n";
+            message += $"  QA Watcher: {nextSprint.Watcher?.Name ?? "None"}\n";
+            message += $"  Starts: {nextSprint.StartDate:MMM dd, yyyy}\n";
+        }
+        else
+        {
+            message += "No upcoming sprint scheduled.\n";
+        }
+
+        System.Windows.MessageBox.Show(message, "QA Sprint Hub - Notifications",
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+    }
+
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
         // Minimize to tray instead of closing (configurable in settings)

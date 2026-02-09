@@ -1,8 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using QASprintHub.Data;
 using QASprintHub.Services;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
@@ -11,6 +14,8 @@ namespace QASprintHub.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly IExportService _exportService;
+    private readonly AppDbContext _context;
+    private readonly ISprintService _sprintService;
 
     [ObservableProperty]
     private int _sprintDurationDays = 10;
@@ -36,23 +41,57 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _databaseLocation = string.Empty;
 
-    public SettingsViewModel(IExportService exportService)
+    public SettingsViewModel(IExportService exportService, AppDbContext context, ISprintService sprintService)
     {
         _exportService = exportService;
+        _context = context;
+        _sprintService = sprintService;
 
         // Get database location
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         DatabaseLocation = Path.Combine(appDataPath, "QASprintHub", "qasprinthub.db");
     }
 
-    public void LoadSettings()
+    public async Task LoadSettingsAsync()
     {
-        // TODO: Load settings from configuration file or registry
+        var settings = await _context.AppSettings.FirstOrDefaultAsync();
+        if (settings != null)
+        {
+            SprintDurationDays = settings.SprintDurationDays;
+            // Other settings can be added here when AppSettings model is expanded
+        }
     }
 
-    public void SaveSettings()
+    [RelayCommand]
+    private async Task SaveSettingsAsync()
     {
-        // TODO: Save settings to configuration file or registry
+        var settings = await _context.AppSettings.FirstOrDefaultAsync();
+        if (settings != null)
+        {
+            var oldDuration = settings.SprintDurationDays;
+            settings.SprintDurationDays = SprintDurationDays;
+            settings.LastModified = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            // If sprint duration changed, regenerate future sprints
+            if (oldDuration != SprintDurationDays)
+            {
+                // Delete all planned (not started) sprints
+                var plannedSprints = await _context.Sprints
+                    .Where(s => s.Status == Models.Enums.SprintStatus.Planned)
+                    .ToListAsync();
+
+                _context.Sprints.RemoveRange(plannedSprints);
+                await _context.SaveChangesAsync();
+
+                // Regenerate sprints with new duration
+                await _sprintService.GenerateFutureSprintsAsync(6);
+            }
+
+            System.Windows.MessageBox.Show("Settings saved successfully!", "Success",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
     }
 
     [RelayCommand]

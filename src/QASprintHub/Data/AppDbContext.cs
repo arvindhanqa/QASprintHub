@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<WatcherSwap> WatcherSwaps { get; set; } = null!;
     public DbSet<SprintPR> SprintPRs { get; set; } = null!;
     public DbSet<AppSettings> AppSettings { get; set; } = null!;
+    public DbSet<DayNote> DayNotes { get; set; } = null!;
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -108,6 +109,14 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.SprintId)
                   .OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.Status);
+        });
+
+        // DayNote configuration
+        modelBuilder.Entity<DayNote>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Notes).HasMaxLength(5000);
+            entity.HasIndex(e => e.Date).IsUnique();
         });
     }
 

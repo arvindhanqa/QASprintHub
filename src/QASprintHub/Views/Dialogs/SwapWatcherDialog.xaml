@@ -1,0 +1,53 @@
+<Window x:Class="QASprintHub.Views.Dialogs.SwapWatcherDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Title="Swap QA Watcher"
+        Height="450" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Background="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="Swap QA Watcher" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+        <!-- Current Watcher -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="Current Watcher:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBlock x:Name="CurrentWatcherText" FontSize="16" Foreground="#666"/>
+        </StackPanel>
+
+        <!-- Select New Watcher -->
+        <TextBlock Grid.Row="2" Text="Select New Watcher:" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+        <ListBox Grid.Row="3" x:Name="MembersListBox" Margin="0,0,0,15">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" Padding="5"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Reason -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,15">
+            <TextBlock Text="Reason (optional):" Margin="0,0,0,5"/>
+            <TextBox x:Name="ReasonTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Padding="8"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <ui:Button Content="Cancel" Appearance="Secondary" Click="Cancel_Click" Margin="0,0,10,0" Padding="20,8"/>
+            <ui:Button Content="Swap" Appearance="Primary" Click="OK_Click" Padding="20,8"/>
+        </StackPanel>
+    </Grid>
+</Window>

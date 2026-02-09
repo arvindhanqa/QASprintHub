@@ -146,4 +146,137 @@ public class SprintService : ISprintService
 
         return activeMembers[nextIndex].Id;
     }
+
+    public async Task GenerateFutureSprintsAsync(int monthsAhead = 6)
+    {
+        // Get app settings for sprint duration
+        var settings = await _context.AppSettings.FirstOrDefaultAsync();
+        if (settings == null || !settings.IsConfigured)
+        {
+            return; // Not configured yet
+        }
+
+        var sprintDurationDays = settings.SprintDurationDays;
+
+        // Get the last sprint
+        var lastSprint = await _context.Sprints
+            .OrderByDescending(s => s.StartDate)
+            .FirstOrDefaultAsync();
+
+        if (lastSprint == null)
+        {
+            return; // No sprints exist
+        }
+
+        // Calculate target date (months ahead from today)
+        var targetDate = DateTime.Today.AddMonths(monthsAhead);
+
+        // Generate sprints until we reach the target date
+        var nextStartDate = lastSprint.EndDate.AddDays(1);
+
+        // Skip weekends for start date
+        while (nextStartDate.DayOfWeek == DayOfWeek.Saturday || nextStartDate.DayOfWeek == DayOfWeek.Sunday)
+        {
+            nextStartDate = nextStartDate.AddDays(1);
+        }
+
+        while (nextStartDate <= targetDate)
+        {
+            // Check if sprint already exists for this start date
+            var existingSprint = await _context.Sprints
+                .Where(s => s.StartDate == nextStartDate)
+                .FirstOrDefaultAsync();
+
+            if (existingSprint == null)
+            {
+                // Calculate end date (working days only)
+                var endDate = CalculateEndDate(nextStartDate, sprintDurationDays);
+
+                // Get next watcher
+                var watcherId = await GetNextWatcherIdAsync();
+
+                // Create sprint without marking previous as completed
+                var newSprint = new Sprint
+                {
+                    StartDate = nextStartDate,
+                    EndDate = endDate,
+                    WatcherId = watcherId,
+                    Status = SprintStatus.Planned,
+                    CreatedDate = DateTime.Now
+                };
+
+                _context.Sprints.Add(newSprint);
+                await _context.SaveChangesAsync(); // Save immediately to make it available for GetNextWatcherIdAsync
+            }
+
+            // Move to next sprint start date
+            var currentLastSprint = await _context.Sprints
+                .OrderByDescending(s => s.StartDate)
+                .FirstOrDefaultAsync();
+
+            if (currentLastSprint != null)
+            {
+                nextStartDate = currentLastSprint.EndDate.AddDays(1);
+                // Skip weekends
+                while (nextStartDate.DayOfWeek == DayOfWeek.Saturday || nextStartDate.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    nextStartDate = nextStartDate.AddDays(1);
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    private DateTime CalculateEndDate(DateTime startDate, int durationDays)
+    {
+        var endDate = startDate;
+        var workingDaysAdded = 0;
+
+        while (workingDaysAdded < durationDays)
+        {
+            endDate = endDate.AddDays(1);
+            // Skip weekends (Saturday = 6, Sunday = 0)
+            if (endDate.DayOfWeek != DayOfWeek.Saturday && endDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                workingDaysAdded++;
+            }
+        }
+
+        return endDate.AddDays(-1); // Subtract 1 because we want the last working day
+    }
+
+    public async Task ActivatePlannedSprintsAsync()
+    {
+        var today = DateTime.Today;
+
+        // Find all active sprints that have ended
+        var expiredSprints = await _context.Sprints
+            .Where(s => s.Status == SprintStatus.Active && s.EndDate < today)
+            .ToListAsync();
+
+        // Mark them as completed
+        foreach (var sprint in expiredSprints)
+        {
+            sprint.Status = SprintStatus.Completed;
+        }
+
+        // Find planned sprints that should be active now
+        var sprintsToActivate = await _context.Sprints
+            .Where(s => s.Status == SprintStatus.Planned && s.StartDate <= today && s.EndDate >= today)
+            .ToListAsync();
+
+        // Activate them
+        foreach (var sprint in sprintsToActivate)
+        {
+            sprint.Status = SprintStatus.Active;
+        }
+
+        if (expiredSprints.Any() || sprintsToActivate.Any())
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
 }

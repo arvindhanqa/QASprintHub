@@ -9,8 +9,9 @@ public partial class SetupWizardDialog : Window
     public SetupWizardDialog()
     {
         InitializeComponent();
-            this.Loaded += SetupWizardDialog_Loaded;
-            this.DataContextChanged += SetupWizardDialog_DataContextChanged;
+        this.Loaded += SetupWizardDialog_Loaded;
+        this.DataContextChanged += SetupWizardDialog_DataContextChanged;
+        this.Closing += Window_Closing;
     }
 
     public bool SetupCompleted { get; set; }

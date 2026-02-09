@@ -93,15 +93,36 @@ public partial class DashboardViewModel : ObservableObject
     [RelayCommand]
     private async Task SwapWatcherAsync()
     {
-        // TODO: Open swap watcher dialog
-        await Task.CompletedTask;
+        if (CurrentSprint == null || CurrentWatcher == null) return;
+
+        var teamService = App.GetService<ITeamService>();
+        var allMembers = await teamService.GetActiveMembersAsync();
+        var availableMembers = allMembers.Where(m => m.Id != CurrentWatcher.Id).ToList();
+
+        var dialog = new Views.Dialogs.SwapWatcherDialog(CurrentWatcher.Name, availableMembers);
+        if (dialog.ShowDialog() == true && dialog.SelectedMember != null)
+        {
+            await _watcherService.SwapWatcherAsync(CurrentSprint.Id, dialog.SelectedMember.Id, dialog.Reason);
+            await LoadDataAsync();
+            _notificationService.ShowWatcherNotification(CurrentSprint, NextWatcher?.Name);
+        }
     }
 
     [RelayCommand]
     private async Task AssignBackupAsync()
     {
-        // TODO: Open assign backup dialog
-        await Task.CompletedTask;
+        if (CurrentSprint == null || CurrentWatcher == null) return;
+
+        var teamService = App.GetService<ITeamService>();
+        var allMembers = await teamService.GetActiveMembersAsync();
+        var availableMembers = allMembers.Where(m => m.Id != CurrentWatcher.Id).ToList();
+
+        var dialog = new Views.Dialogs.AssignBackupDialog(availableMembers);
+        if (dialog.ShowDialog() == true && dialog.SelectedMember != null)
+        {
+            await _watcherService.AssignBackupWatcherAsync(CurrentSprint.Id, dialog.SelectedMember.Id);
+            await LoadDataAsync();
+        }
     }
 
     [RelayCommand]

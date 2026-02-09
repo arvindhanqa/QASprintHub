@@ -46,8 +46,22 @@ public partial class SprintPRsViewModel : ObservableObject
     [RelayCommand]
     private async Task AddPRAsync()
     {
-        // TODO: Open add PR dialog
-        await Task.CompletedTask;
+        if (CurrentSprint == null) return;
+
+        var dialog = new Views.Dialogs.AddPRDialog();
+        if (dialog.ShowDialog() == true)
+        {
+            await _prService.AddPRAsync(new Models.SprintPR
+            {
+                SprintId = CurrentSprint.Id,
+                Title = dialog.PRTitle,
+                Author = dialog.Author,
+                Status = dialog.Status,
+                Priority = dialog.Priority,
+                CreatedDate = System.DateTime.Now
+            });
+            await LoadDataAsync();
+        }
     }
 
     [RelayCommand]

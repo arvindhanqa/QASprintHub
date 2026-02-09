@@ -16,4 +16,6 @@ public interface ISprintService
     Task UpdateSprintAsync(Sprint sprint);
     Task<Sprint?> GetNextSprintAsync();
     Task<int> GetNextWatcherIdAsync();
+    Task GenerateFutureSprintsAsync(int monthsAhead = 6);
+    Task ActivatePlannedSprintsAsync();
 }
