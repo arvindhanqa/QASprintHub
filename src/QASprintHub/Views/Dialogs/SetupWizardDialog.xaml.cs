@@ -71,7 +71,12 @@ public partial class SetupWizardDialog : Window
             if (vm.IsComplete)
             {
                 // Close the dialog when VM marks setup complete
-                Dispatcher.Invoke(() => Close());
+                Dispatcher.Invoke(() =>
+                {
+                    SetupCompleted = true;
+                    DialogResult = true;
+                    Close();
+                });
             }
         }
     }

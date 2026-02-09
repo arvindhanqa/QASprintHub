@@ -72,7 +72,7 @@
                                                       Path=(ItemsControl.AlternationIndex),
                                                       Converter={StaticResource IndexPlusOneConverter}}"
                                               Width="30" FontWeight="Bold" VerticalAlignment="Center"/>
-                                    <TextBox Text="{Binding Path=., Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                             Width="400"/>
                                 </StackPanel>
                             </DataTemplate>
