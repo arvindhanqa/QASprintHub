@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using QASprintHub.Models;
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace QASprintHub.Data;
 
@@ -12,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<BackupWatcher> BackupWatchers { get; set; } = null!;
     public DbSet<WatcherSwap> WatcherSwaps { get; set; } = null!;
     public DbSet<SprintPR> SprintPRs { get; set; } = null!;
+    public DbSet<AppSettings> AppSettings { get; set; } = null!;
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

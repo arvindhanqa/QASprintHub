@@ -129,7 +129,7 @@ public partial class CalendarDiaryViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task GoToDateAsync(DateTime date)
+    public async Task GoToDateAsync(DateTime date)
     {
         SelectedDate = date;
         await LoadSprintForDateAsync(date);

@@ -80,13 +80,19 @@ public partial class WatcherManagementViewModel : ObservableObject
     [RelayCommand]
     private async Task MoveUpAsync(TeamMember? member)
     {
-        if (member == null || member.RotationOrder <= 1) return;
+        var target = member ?? SelectedMember;
+        if (target == null || target.RotationOrder <= 1) return;
 
         var members = ActiveMembers.OrderBy(m => m.RotationOrder).ToList();
-        var index = members.IndexOf(member);
+        var index = members.FindIndex(m => m.Id == target.Id);
         if (index > 0)
         {
-            (members[index], members[index - 1]) = (members[index - 1], members[index]);
+            var upper = members[index - 1];
+            var current = members[index];
+            var tmp = upper.RotationOrder;
+            upper.RotationOrder = current.RotationOrder;
+            current.RotationOrder = tmp;
+
             await _teamService.ReorderMembersAsync(members.Select(m => m.Id).ToList());
             await LoadDataAsync();
         }

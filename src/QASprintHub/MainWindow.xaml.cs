@@ -24,6 +24,11 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
 
+        // Allow normal window chrome behavior
+        this.ResizeMode = System.Windows.ResizeMode.CanResize;
+        this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
+        this.ShowInTaskbar = true;
+
         _serviceProvider = serviceProvider;
         _trayService = trayService;
         _notificationService = notificationService;
@@ -34,6 +39,14 @@ public partial class MainWindow : FluentWindow
 
         // Set up navigation
         NavigationView.SelectionChanged += NavigationView_SelectionChanged;
+        // Ensure clicking menu items also navigates
+        NavigationView.ItemInvoked += (s, e) =>
+        {
+            if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+            {
+                NavigateTo(tag);
+            }
+        };
 
         // Set up tray service events
         _trayService.OpenRequested += (s, e) => ShowMainWindow();
@@ -63,12 +76,20 @@ public partial class MainWindow : FluentWindow
         catch (Exception ex)
         {
             // Log error (in production, use a proper logging framework)
-            MessageBox.Show($"Error loading sprint information: {ex.Message}", "Error",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            System.Windows.MessageBox.Show($"Error loading sprint information: {ex.Message}", "Error",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
         }
     }
 
     private void NavigationView_SelectionChanged(NavigationView sender, RoutedEventArgs args)
+    {
+        if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+        {
+            NavigateTo(tag);
+        }
+    }
+
+    private void NavigationView_ItemInvoked(object sender, RoutedEventArgs e)
     {
         if (NavigationView.SelectedItem is NavigationViewItem item && item.Tag is string tag)
         {
@@ -133,8 +154,8 @@ public partial class MainWindow : FluentWindow
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Navigation error: {ex.Message}", "Error",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show($"Navigation error: {ex.Message}", "Error",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 

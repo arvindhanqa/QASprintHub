@@ -1,6 +1,6 @@
-using Microsoft.Toolkit.Uwp.Notifications;
 using QASprintHub.Models;
 using System;
+using System.Diagnostics;
 
 namespace QASprintHub.Services;
 
@@ -10,43 +10,54 @@ public class NotificationService : INotificationService
     {
         if (sprint.Watcher == null) return;
 
-        var builder = new ToastContentBuilder()
-            .AddText("🛡️ QA Sprint Hub")
-            .AddText($"{sprint.Watcher.Name} is the QA Watcher")
-            .AddText($"for {sprint.DisplayName}");
-
-        if (nextWatcher != null)
+        try
         {
-            builder.AddText($"Next watcher: {nextWatcher.Name}");
+            var message = $"[Notification] {sprint.Watcher.Name} is the QA Watcher for {sprint.DisplayName}";
+            if (nextWatcher != null)
+            {
+                message += $" | Next: {nextWatcher.Name}";
+            }
+            Debug.WriteLine(message);
         }
-
-        builder.Show();
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Notification error: {ex.Message}");
+        }
     }
 
     public void ShowSwapNotification(TeamMember scheduledWatcher, TeamMember actualWatcher, Sprint sprint)
     {
-        new ToastContentBuilder()
-            .AddText("Watcher Swap")
-            .AddText($"{scheduledWatcher.Name} → {actualWatcher.Name}")
-            .AddText($"Sprint: {sprint.DisplayName}")
-            .Show();
+        try
+        {
+            Debug.WriteLine($"[Swap] {scheduledWatcher.Name} -> {actualWatcher.Name} (Sprint: {sprint.DisplayName})");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Notification error: {ex.Message}");
+        }
     }
 
     public void ShowBackupAssignedNotification(TeamMember backupMember, Sprint sprint)
     {
-        new ToastContentBuilder()
-            .AddText("Backup Watcher Assigned")
-            .AddText($"{backupMember.Name} is backup watcher")
-            .AddText($"Sprint: {sprint.DisplayName}")
-            .Show();
+        try
+        {
+            Debug.WriteLine($"[Backup Assigned] {backupMember.Name} assigned for {sprint.DisplayName}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Notification error: {ex.Message}");
+        }
     }
 
     public void ShowSprintEndingNotification(Sprint sprint, int daysRemaining)
     {
-        new ToastContentBuilder()
-            .AddText("Sprint Ending Soon")
-            .AddText($"Sprint ends in {daysRemaining} working day{(daysRemaining != 1 ? "s" : "")}")
-            .AddText($"{sprint.DisplayName}")
-            .Show();
+        try
+        {
+            Debug.WriteLine($"[Sprint Ending] {sprint.DisplayName} ends in {daysRemaining} working day{(daysRemaining != 1 ? "s" : "")}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Notification error: {ex.Message}");
+        }
     }
 }

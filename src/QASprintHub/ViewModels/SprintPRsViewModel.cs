@@ -18,7 +18,7 @@ public partial class SprintPRsViewModel : ObservableObject
     private Sprint? _currentSprint;
 
     [ObservableProperty]
-    private ObservableCollection<SprintPR> _prs = new();
+    private ObservableCollection<SprintPR> _PRs = new();
 
     [ObservableProperty]
     private SprintPR? _selectedPR;
@@ -67,7 +67,6 @@ public partial class SprintPRsViewModel : ObservableObject
         await LoadDataAsync();
     }
 
-    [RelayCommand]
     private async Task UpdatePRStatusAsync(SprintPR? pr, PRStatus newStatus)
     {
         if (pr == null) return;

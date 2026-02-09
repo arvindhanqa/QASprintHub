@@ -17,10 +17,20 @@ public class TrayService : ITrayService
     {
         _trayIcon = new TaskbarIcon
         {
-            IconSource = new System.Windows.Media.Imaging.BitmapImage(
-                new Uri("pack://application:,,,/Assets/app-icon.ico")),
             ToolTipText = "QA Sprint Hub"
         };
+
+        // Try to load the app icon; if it's missing, continue without an icon to avoid crashing at startup
+        try
+        {
+            var iconUri = new Uri("pack://application:,,,/Assets/app-icon.ico");
+            var bmp = new System.Windows.Media.Imaging.BitmapImage(iconUri);
+            _trayIcon.IconSource = bmp;
+        }
+        catch
+        {
+            // Ignore - resource may be missing in published build
+        }
 
         _trayIcon.TrayMouseDoubleClick += (s, e) => OpenRequested?.Invoke(this, EventArgs.Empty);
 
@@ -65,7 +75,27 @@ public class TrayService : ITrayService
         contextMenu.Items.Add(new Separator());
 
         var exitItem = new MenuItem { Header = "Exit" };
-        exitItem.Click += (s, e) => ExitRequested?.Invoke(this, EventArgs.Empty);
+        exitItem.Click += (s, e) =>
+        {
+            // Notify subscribers
+            ExitRequested?.Invoke(this, EventArgs.Empty);
+
+            // Ensure app shuts down even if no subscriber handled it
+            try
+            {
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        try { Application.Current.Shutdown(); } catch { }
+                    }));
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+        };
         contextMenu.Items.Add(exitItem);
 
         _trayIcon.ContextMenu = contextMenu;

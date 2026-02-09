@@ -11,13 +11,13 @@
             <!-- Current QA Watcher Card -->
             <GroupBox Header="CURRENT QA WATCHER" Margin="0,0,0,20">
                 <StackPanel Margin="10">
-                    <TextBlock Text="{Binding CurrentWatcher.Name, StringFormat='🛡️ {0}'}" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentWatcher.Name, StringFormat='{}🛡️ {0}'}" FontSize="24" FontWeight="Bold"/>
                     <TextBlock Text="{Binding CurrentSprint.DisplayName}" FontSize="14" Foreground="Gray"/>
-                    <TextBlock Text="{Binding CurrentDay, StringFormat='Day {0} of'}" FontSize="14" Foreground="Gray"/>
-                    <TextBlock Text="{Binding TotalDays, StringFormat='{0} working days'}" FontSize="14" Foreground="Gray"/>
+                    <TextBlock Text="{Binding CurrentDay, StringFormat='{}Day {0} of'}" FontSize="14" Foreground="Gray"/>
+                    <TextBlock Text="{Binding TotalDays, StringFormat='{}{0} working days'}" FontSize="14" Foreground="Gray"/>
 
                     <!-- Backup Watcher Info -->
-                    <TextBlock Text="{Binding CurrentBackup.BackupMember.Name, StringFormat='🔄 Backup: {0}'}"
+                    <TextBlock Text="{Binding CurrentBackup.BackupMember.Name, StringFormat='{}🔄 Backup: {0}'}"
                                FontSize="14" Margin="0,10,0,0"
                                Visibility="{Binding CurrentBackup, Converter={StaticResource NullToVisibilityConverter}}"/>
 
@@ -61,7 +61,7 @@
             <!-- Upcoming -->
             <GroupBox Header="UPCOMING" Margin="0,0,0,20">
                 <StackPanel Margin="10">
-                    <TextBlock Text="{Binding NextWatcher.Name, StringFormat='Next Watcher: {0}'}" FontSize="14"/>
+                    <TextBlock Text="{Binding NextWatcher.Name, StringFormat='{}Next Watcher: {0}'}" FontSize="14"/>
                     <TextBlock Text="{Binding NextSprint.DisplayName}" FontSize="14" Foreground="Gray"/>
                 </StackPanel>
             </GroupBox>

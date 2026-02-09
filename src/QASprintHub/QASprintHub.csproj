@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon>
 
     <!-- Build Configuration for Security and Compliance -->
     <PublishSingleFile>true</PublishSingleFile>
@@ -51,6 +50,7 @@
 
     <!-- Windows Toast Notifications -->
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <!-- Windows SDK contracts removed for option C (debug fallback) -->
   </ItemGroup>
 
   <ItemGroup>

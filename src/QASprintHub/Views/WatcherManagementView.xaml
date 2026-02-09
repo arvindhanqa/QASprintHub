@@ -21,7 +21,7 @@
                 </Grid.RowDefinitions>
 
                 <ListBox Grid.Row="0" ItemsSource="{Binding ActiveMembers}"
-                         SelectedItem="{Binding SelectedMember}">
+                         SelectedItem="{Binding SelectedMember, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

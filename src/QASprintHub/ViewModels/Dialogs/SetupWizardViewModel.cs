@@ -39,6 +39,30 @@ public partial class SetupWizardViewModel : ObservableObject
         UpdateTeamMembersList();
     }
 
+    [RelayCommand]
+    private async Task SaveSettingsAsync()
+    {
+        // Persist app settings and initial sprint configuration
+        try
+        {
+            var settings = new QASprintHub.Models.AppSettings
+            {
+                SprintDurationDays = SprintDurationDays,
+                FirstSprintStartDate = FirstSprintStartDate,
+                IsConfigured = true,
+                LastModified = DateTime.Now
+            };
+            // Save via DbContext
+            var db = App.GetService<QASprintHub.Data.AppDbContext>();
+            db.AppSettings.Add(settings);
+            await db.SaveChangesAsync();
+        }
+        catch
+        {
+            // ignore for now
+        }
+    }
+
     partial void OnTeamSizeChanged(int value)
     {
         UpdateTeamMembersList();
@@ -102,6 +126,9 @@ public partial class SetupWizardViewModel : ObservableObject
             var endDate = CalculateEndDate(FirstSprintStartDate, SprintDurationDays);
             var nextWatcherId = await _sprintService.GetNextWatcherIdAsync();
             await _sprintService.CreateSprintAsync(FirstSprintStartDate, endDate, nextWatcherId);
+
+            // Persist settings so setup won't run again
+            await SaveSettingsAsync();
 
             IsComplete = true;
         }

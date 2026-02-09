@@ -5,7 +5,8 @@
         Title="QA Sprint Hub - Initial Setup"
         Height="550" Width="700"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Closing="Window_Closing">
     <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -63,7 +64,7 @@
 
                     <TextBlock Text="Enter the names of your team members in rotation order:" Margin="0,0,0,10"/>
 
-                    <ItemsControl ItemsSource="{Binding TeamMemberNames}">
+                    <ItemsControl x:Name="MembersList" ItemsSource="{Binding TeamMemberNames}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -108,9 +109,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <ui:Button Content="Skip Setup" Command="{Binding SkipSetupCommand}"
-                          Padding="15,8" Margin="0,0,10,0"
-                          Visibility="{Binding CurrentStep, Converter={StaticResource EqualityToVisibilityConverter}, ConverterParameter=1}"/>
+                <!-- Skip Setup removed to enforce mandatory initial configuration -->
                 <ui:Button Content="Next →"
                           Command="{Binding NextStepCommand}"
                           Visibility="{Binding CurrentStep, Converter={StaticResource LessThanToVisibilityConverter}, ConverterParameter=3}"

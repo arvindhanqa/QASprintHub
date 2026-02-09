@@ -4,6 +4,7 @@ using QASprintHub.Models;
 using QASprintHub.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace QASprintHub.ViewModels;

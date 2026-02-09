@@ -6,6 +6,7 @@ using QASprintHub.Services;
 using QASprintHub.ViewModels;
 using QASprintHub.Views;
 using System;
+using Microsoft.Win32;
 using System.IO;
 using System.Windows;
 
@@ -30,13 +31,14 @@ public partial class App : Application
                     options.UseSqlite($"Data Source={dbPath};Mode=ReadWriteCreate;"));
 
                 // Services
-                services.AddSingleton<ITeamService, TeamService>();
-                services.AddSingleton<ISprintService, SprintService>();
-                services.AddSingleton<IWatcherService, WatcherService>();
-                services.AddSingleton<IPRService, PRService>();
+                // Services that depend on AppDbContext should be transient to avoid capturing scoped DbContext in singletons
+                services.AddTransient<ITeamService, TeamService>();
+                services.AddTransient<ISprintService, SprintService>();
+                services.AddTransient<IWatcherService, WatcherService>();
+                services.AddTransient<IPRService, PRService>();
                 services.AddSingleton<INotificationService, NotificationService>();
                 services.AddSingleton<ITrayService, TrayService>();
-                services.AddSingleton<IExportService, ExportService>();
+                services.AddTransient<IExportService, ExportService>();
 
                 // ViewModels
                 services.AddTransient<DashboardViewModel>();
@@ -57,7 +59,14 @@ public partial class App : Application
                 services.AddTransient<Views.Dialogs.SetupWizardDialog>();
 
                 // Main Window
-                services.AddSingleton<MainWindow>();
+                services.AddSingleton<MainWindow>(sp =>
+                {
+                    // Resolve required services on demand to avoid capturing scoped services in constructor
+                    return ActivatorUtilities.CreateInstance<MainWindow>(sp,
+                        sp.GetRequiredService<ITrayService>(),
+                        sp.GetRequiredService<INotificationService>(),
+                        sp.GetRequiredService<ISprintService>());
+                });
             })
             .Build();
     }
@@ -71,10 +80,42 @@ public partial class App : Application
         await dbContext.Database.EnsureCreatedAsync();
 
         // Check if setup is needed
+        var settingsDb = _host.Services.GetRequiredService<AppDbContext>();
+
+        // Ensure AppSettings table exists (avoid EF query exceptions on older DBs)
+        var ensureSettingsTableSql = @"CREATE TABLE IF NOT EXISTS AppSettings (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    SprintDurationDays INTEGER NOT NULL,
+    FirstSprintStartDate TEXT NULL,
+    IsConfigured INTEGER NOT NULL,
+    CreatedDate TEXT NOT NULL,
+    LastModified TEXT NOT NULL
+);";
+        try
+        {
+            await settingsDb.Database.ExecuteSqlRawAsync(ensureSettingsTableSql);
+        }
+        catch
+        {
+            // ignore failures here; we'll treat as not configured below
+        }
+
+        QASprintHub.Models.AppSettings? appSettings = null;
+        try
+        {
+            appSettings = await settingsDb.AppSettings.FirstOrDefaultAsync();
+        }
+        catch
+        {
+            // ignore - treat as no settings
+        }
+
         var teamService = _host.Services.GetRequiredService<ITeamService>();
         var activeMembers = await teamService.GetActiveMembersAsync();
 
-        if (activeMembers.Count == 0)
+        var needsSetup = appSettings == null || !appSettings.IsConfigured || activeMembers.Count == 0;
+
+        if (needsSetup)
         {
             // Show setup wizard for first-time users
             var setupWizard = _host.Services.GetRequiredService<Views.Dialogs.SetupWizardDialog>();
@@ -93,13 +134,41 @@ public partial class App : Application
 
         // Initialize tray service
         var trayService = _host.Services.GetRequiredService<ITrayService>();
-        trayService.Initialize();
+        try
+        {
+            trayService.Initialize();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error initializing tray service: {ex.Message}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
 
         // Show main window
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-        mainWindow.Show();
+        try
+        {
+            mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error showing main window: {ex.Message}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
 
         base.OnStartup(e);
+
+        // Save data on system shutdown/session end
+        SystemEvents.SessionEnding += (s, ev) =>
+        {
+            try
+            {
+                var dbContext = _host.Services.GetRequiredService<AppDbContext>();
+                dbContext.SaveChanges();
+            }
+            catch
+            {
+                // ignore
+            }
+        };
     }
 
     protected override async void OnExit(ExitEventArgs e)
@@ -107,6 +176,16 @@ public partial class App : Application
         // Cleanup tray service
         var trayService = _host.Services.GetRequiredService<ITrayService>();
         trayService.Shutdown();
+
+        try
+        {
+            var dbContext = _host.Services.GetRequiredService<AppDbContext>();
+            await dbContext.SaveChangesAsync();
+        }
+        catch
+        {
+            // ignore
+        }
 
         await _host.StopAsync();
         _host.Dispose();
