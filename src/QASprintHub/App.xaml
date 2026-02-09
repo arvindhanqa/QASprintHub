@@ -18,6 +18,11 @@
             <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"/>
             <converters:BoolToBorderThicknessConverter x:Key="BoolToBorderThicknessConverter"/>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+            <converters:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter"/>
+            <converters:GreaterThanToVisibilityConverter x:Key="GreaterThanToVisibilityConverter"/>
+            <converters:LessThanToVisibilityConverter x:Key="LessThanToVisibilityConverter"/>
+            <converters:IndexPlusOneConverter x:Key="IndexPlusOneConverter"/>
+            <converters:StepToColorConverter x:Key="StepToColorConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
