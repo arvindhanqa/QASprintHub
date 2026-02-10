@@ -37,6 +37,12 @@ public partial class CalendarDiaryViewModel : ObservableObject
     private string _watcherName = string.Empty;
 
     [ObservableProperty]
+    private string _backupWatcherName = string.Empty;
+
+    [ObservableProperty]
+    private bool _isWatcherSwapped;
+
+    [ObservableProperty]
     private ObservableCollection<SprintPR> _dayPRs = new();
 
     [ObservableProperty]
@@ -71,6 +77,14 @@ public partial class CalendarDiaryViewModel : ObservableObject
             SprintTitle = CurrentSprint.DisplayName;
             WatcherName = CurrentSprint.Watcher?.Name ?? "No watcher assigned";
 
+            // Load backup watcher
+            var backupWatcher = await _watcherService.GetActiveBackupWatcherAsync(CurrentSprint.Id);
+            BackupWatcherName = backupWatcher?.TeamMember?.Name ?? string.Empty;
+
+            // Check if watcher was swapped
+            var swap = await _watcherService.GetSwapForSprintAsync(CurrentSprint.Id);
+            IsWatcherSwapped = swap != null;
+
             // Build sprint days
             BuildSprintDays();
 
@@ -88,6 +102,7 @@ public partial class CalendarDiaryViewModel : ObservableObject
         {
             SprintTitle = "No sprint found for this date";
             WatcherName = string.Empty;
+            BackupWatcherName = string.Empty;
             SprintDays.Clear();
             DayPRs.Clear();
         }

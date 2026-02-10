@@ -120,4 +120,13 @@ public class WatcherService : IWatcherService
             .OrderByDescending(s => s.SwapDate)
             .ToListAsync();
     }
+
+    public async Task<WatcherSwap?> GetSwapForSprintAsync(int sprintId)
+    {
+        return await _context.WatcherSwaps
+            .Include(s => s.ScheduledWatcher)
+            .Include(s => s.ActualWatcher)
+            .Where(s => s.SprintId == sprintId)
+            .FirstOrDefaultAsync();
+    }
 }

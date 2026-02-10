@@ -4,12 +4,13 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:enums="clr-namespace:QASprintHub.Models.Enums"
         Title="Add Pull Request"
-        Height="450" Width="500"
+        Height="520" Width="500"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         Background="White">
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -34,8 +35,15 @@
             <TextBox x:Name="AuthorTextBox" Padding="8" FontSize="14"/>
         </StackPanel>
 
-        <!-- Status -->
+        <!-- Link -->
         <StackPanel Grid.Row="3" Margin="0,0,0,15">
+            <TextBlock Text="Link (optional):" Margin="0,0,0,5"/>
+            <TextBox x:Name="LinkTextBox" Padding="8" FontSize="14"
+                     ToolTip="Enter the pull request URL"/>
+        </StackPanel>
+
+        <!-- Status -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,15">
             <TextBlock Text="Status:" Margin="0,0,0,5"/>
             <ComboBox x:Name="StatusComboBox" Padding="8" FontSize="14" SelectedIndex="0">
                 <ComboBoxItem Content="Pending" Tag="Pending"/>
@@ -46,7 +54,7 @@
         </StackPanel>
 
         <!-- Priority -->
-        <StackPanel Grid.Row="4" Margin="0,0,0,15">
+        <StackPanel Grid.Row="5" Margin="0,0,0,15">
             <TextBlock Text="Priority:" Margin="0,0,0,5"/>
             <ComboBox x:Name="PriorityComboBox" Padding="8" FontSize="14" SelectedIndex="1">
                 <ComboBoxItem Content="Low" Tag="Low"/>
@@ -56,7 +64,7 @@
         </StackPanel>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <ui:Button Content="Cancel" Appearance="Secondary" Click="Cancel_Click" Margin="0,0,10,0" Padding="20,8"/>
             <ui:Button Content="Add" Appearance="Primary" Click="OK_Click" Padding="20,8"/>
         </StackPanel>

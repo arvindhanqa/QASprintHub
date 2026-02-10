@@ -4,8 +4,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:enums="clr-namespace:QASprintHub.Models.Enums"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="PRStatusValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:PRStatus"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,8 +32,15 @@
                 <!-- Sprint Title and Watcher -->
                 <StackPanel Grid.Row="0">
                     <TextBlock Text="{Binding SprintTitle}" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="{Binding WatcherName, StringFormat='🛡️ QA Watcher: {0}'}"
-                              FontSize="16" Foreground="#ECF0F1" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="{Binding WatcherName, StringFormat='🛡️ QA Watcher: {0}'}"
+                                  FontSize="16" Foreground="#ECF0F1"/>
+                        <TextBlock Text=" (swapped)" FontSize="14" Foreground="Orange" Margin="10,0,0,0"
+                                   Visibility="{Binding IsWatcherSwapped, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding BackupWatcherName, StringFormat='👤 Backup: {0}'}"
+                              FontSize="14" Foreground="#BDC3C7" Margin="0,3,0,0"
+                              Visibility="{Binding BackupWatcherName, Converter={StaticResource StringToVisibilityConverter}}"/>
                 </StackPanel>
 
                 <!-- Navigation Controls -->
@@ -111,6 +127,7 @@
                                      CanUserAddRows="False"
                                      HeadersVisibility="Column"
                                      GridLinesVisibility="Horizontal"
+                                     CellEditEnding="DataGrid_CellEditEnding"
                                      MaxHeight="400">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*"/>
@@ -125,6 +142,12 @@
                                                 </Border>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding Source={StaticResource PRStatusValues}}"
+                                                         SelectedItem="{Binding Status, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
                                     </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="80"/>
                                 </DataGrid.Columns>

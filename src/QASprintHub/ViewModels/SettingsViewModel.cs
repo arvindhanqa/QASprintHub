@@ -58,7 +58,12 @@ public partial class SettingsViewModel : ObservableObject
         if (settings != null)
         {
             SprintDurationDays = settings.SprintDurationDays;
-            // Other settings can be added here when AppSettings model is expanded
+            MinimizeToTray = settings.MinimizeToTray;
+            StartMinimized = settings.StartMinimized;
+            LaunchOnStartup = settings.LaunchOnStartup;
+            ShowWatcherNotification = settings.ShowWatcherNotification;
+            ShowSprintEndingNotification = settings.ShowSprintEndingNotification;
+            ShowSwapNotification = settings.ShowSwapNotification;
         }
     }
 
@@ -70,6 +75,12 @@ public partial class SettingsViewModel : ObservableObject
         {
             var oldDuration = settings.SprintDurationDays;
             settings.SprintDurationDays = SprintDurationDays;
+            settings.MinimizeToTray = MinimizeToTray;
+            settings.StartMinimized = StartMinimized;
+            settings.LaunchOnStartup = LaunchOnStartup;
+            settings.ShowWatcherNotification = ShowWatcherNotification;
+            settings.ShowSprintEndingNotification = ShowSprintEndingNotification;
+            settings.ShowSwapNotification = ShowSwapNotification;
             settings.LastModified = DateTime.Now;
 
             await _context.SaveChangesAsync();

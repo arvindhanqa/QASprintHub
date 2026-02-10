@@ -13,4 +13,5 @@ public interface IWatcherService
     Task RemoveBackupWatcherAsync(int backupWatcherId);
     Task<WatcherSwap> SwapWatcherAsync(int sprintId, int scheduledWatcherId, int actualWatcherId, string reason);
     Task<List<WatcherSwap>> GetSwapHistoryAsync();
+    Task<WatcherSwap?> GetSwapForSprintAsync(int sprintId);
 }

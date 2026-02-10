@@ -54,7 +54,7 @@ public partial class SprintPRsViewModel : ObservableObject
             await _prService.AddPRAsync(
                 CurrentSprint.Id,
                 dialog.PRTitle,
-                null, // link
+                dialog.Link,
                 dialog.Author,
                 dialog.Priority);
             await LoadDataAsync();
@@ -97,5 +97,42 @@ public partial class SprintPRsViewModel : ObservableObject
                 UseShellExecute = true
             });
         }
+    }
+
+    [RelayCommand]
+    private async Task PreviousSprintAsync()
+    {
+        if (CurrentSprint == null) return;
+
+        var previousSprint = await _sprintService.GetPreviousSprintAsync(CurrentSprint.Id);
+        if (previousSprint != null)
+        {
+            await LoadSprintDataAsync(previousSprint);
+        }
+    }
+
+    [RelayCommand]
+    private async Task NextSprintAsync()
+    {
+        if (CurrentSprint == null) return;
+
+        var nextSprint = await _sprintService.GetNextSprintAsync(CurrentSprint.Id);
+        if (nextSprint != null)
+        {
+            await LoadSprintDataAsync(nextSprint);
+        }
+    }
+
+    [RelayCommand]
+    private async Task GoToCurrentSprintAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadSprintDataAsync(Sprint sprint)
+    {
+        CurrentSprint = sprint;
+        var prs = await _prService.GetPRsBySprintIdAsync(sprint.Id);
+        PRs = new ObservableCollection<SprintPR>(prs);
     }
 }

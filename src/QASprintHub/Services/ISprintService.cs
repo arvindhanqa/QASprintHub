@@ -15,6 +15,8 @@ public interface ISprintService
     Task<Sprint> CreateSprintAsync(DateTime startDate, DateTime endDate, int watcherId, string? notes = null);
     Task UpdateSprintAsync(Sprint sprint);
     Task<Sprint?> GetNextSprintAsync();
+    Task<Sprint?> GetPreviousSprintAsync(int sprintId);
+    Task<Sprint?> GetNextSprintAsync(int sprintId);
     Task<int> GetNextWatcherIdAsync();
     Task GenerateFutureSprintsAsync(int monthsAhead = 6);
     Task ActivatePlannedSprintsAsync();

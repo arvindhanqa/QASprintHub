@@ -4,8 +4,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:enums="clr-namespace:QASprintHub.Models.Enums"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="PRStatusValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:PRStatus"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="PRPriorityValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:PRPriority"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,10 +28,23 @@
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-            <TextBlock Text="{Binding CurrentSprint.DisplayName, StringFormat='Sprint PRs — {0}'}"
-                       FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
-            <ui:Button Content="+ Add PR" Command="{Binding AddPRCommand}" Margin="0,0,10,0"/>
+        <StackPanel Grid.Row="0" Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Content="◄◄ Previous Sprint" Command="{Binding PreviousSprintCommand}"
+                       Padding="8,4" Margin="0,0,10,0" Background="#34495E" Foreground="White"
+                       BorderBrush="#7F8C8D"/>
+                <Button Content="Current Sprint" Command="{Binding GoToCurrentSprintCommand}"
+                       Padding="8,4" Margin="0,0,10,0" Background="#3498DB" Foreground="White"
+                       BorderBrush="#2980B9"/>
+                <Button Content="Next Sprint ►►" Command="{Binding NextSprintCommand}"
+                       Padding="8,4" Background="#34495E" Foreground="White"
+                       BorderBrush="#7F8C8D"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentSprint.DisplayName, StringFormat='Sprint PRs — {0}'}"
+                           FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                <ui:Button Content="+ Add PR" Command="{Binding AddPRCommand}" Margin="0,0,10,0"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- PR List -->
@@ -25,13 +52,20 @@
                   SelectedItem="{Binding SelectedPR}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
+                  CellEditEnding="DataGrid_CellEditEnding"
                   Margin="10">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*"/>
                 <DataGridTextColumn Header="Author" Binding="{Binding Author}" Width="150"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
-                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100"/>
+                <DataGridComboBoxColumn Header="Status"
+                                       SelectedItemBinding="{Binding Status, UpdateSourceTrigger=PropertyChanged}"
+                                       ItemsSource="{Binding Source={StaticResource PRStatusValues}}"
+                                       Width="120"/>
+                <DataGridComboBoxColumn Header="Priority"
+                                       SelectedItemBinding="{Binding Priority, UpdateSourceTrigger=PropertyChanged}"
+                                       ItemsSource="{Binding Source={StaticResource PRPriorityValues}}"
+                                       Width="120"/>
             </DataGrid.Columns>
         </DataGrid>
 
