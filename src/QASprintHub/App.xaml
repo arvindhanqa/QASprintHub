@@ -15,6 +15,7 @@
             <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
             <converters:PriorityToColorConverter x:Key="PriorityToColorConverter"/>
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"/>
             <converters:BoolToBorderThicknessConverter x:Key="BoolToBorderThicknessConverter"/>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>

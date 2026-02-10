@@ -63,11 +63,10 @@ public partial class App : Application
                 // Main Window
                 services.AddSingleton<MainWindow>(sp =>
                 {
-                    // Resolve required services on demand to avoid capturing scoped services in constructor
+                    // Resolve singleton services only; transient services resolved on-demand to avoid capturing scoped DbContext
                     return ActivatorUtilities.CreateInstance<MainWindow>(sp,
                         sp.GetRequiredService<ITrayService>(),
-                        sp.GetRequiredService<INotificationService>(),
-                        sp.GetRequiredService<ISprintService>());
+                        sp.GetRequiredService<INotificationService>());
                 });
             })
             .Build();
@@ -92,15 +91,21 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        // Ensure database is created
-        var dbContext = _host.Services.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
+        // Ensure database is created (use scope for scoped DbContext)
+        using (var scope = _host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.Database.EnsureCreatedAsync();
+        }
 
-        // Check if setup is needed
-        var settingsDb = _host.Services.GetRequiredService<AppDbContext>();
+        // Check if setup is needed (use scope for scoped DbContext)
+        QASprintHub.Models.AppSettings? appSettings = null;
+        using (var scope = _host.Services.CreateScope())
+        {
+            var settingsDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        // Ensure AppSettings table exists (avoid EF query exceptions on older DBs)
-        var ensureSettingsTableSql = @"CREATE TABLE IF NOT EXISTS AppSettings (
+            // Ensure AppSettings table exists (avoid EF query exceptions on older DBs)
+            var ensureSettingsTableSql = @"CREATE TABLE IF NOT EXISTS AppSettings (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     SprintDurationDays INTEGER NOT NULL,
     FirstSprintStartDate TEXT NULL,
@@ -108,23 +113,23 @@ public partial class App : Application
     CreatedDate TEXT NOT NULL,
     LastModified TEXT NOT NULL
 );";
-        try
-        {
-            await settingsDb.Database.ExecuteSqlRawAsync(ensureSettingsTableSql);
-        }
-        catch
-        {
-            // ignore failures here; we'll treat as not configured below
-        }
+            try
+            {
+                await settingsDb.Database.ExecuteSqlRawAsync(ensureSettingsTableSql);
+            }
+            catch
+            {
+                // ignore failures here; we'll treat as not configured below
+            }
 
-        QASprintHub.Models.AppSettings? appSettings = null;
-        try
-        {
-            appSettings = await settingsDb.AppSettings.FirstOrDefaultAsync();
-        }
-        catch
-        {
-            // ignore - treat as no settings
+            try
+            {
+                appSettings = await settingsDb.AppSettings.FirstOrDefaultAsync();
+            }
+            catch
+            {
+                // ignore - treat as no settings
+            }
         }
 
         var teamService = _host.Services.GetRequiredService<ITeamService>();
@@ -194,7 +199,8 @@ public partial class App : Application
         {
             try
             {
-                var dbContext = _host.Services.GetRequiredService<AppDbContext>();
+                using var scope = _host.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 dbContext.SaveChanges();
             }
             catch
@@ -212,7 +218,8 @@ public partial class App : Application
 
         try
         {
-            var dbContext = _host.Services.GetRequiredService<AppDbContext>();
+            using var scope = _host.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             await dbContext.SaveChangesAsync();
         }
         catch
