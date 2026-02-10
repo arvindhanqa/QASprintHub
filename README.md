@@ -404,10 +404,14 @@ See `THIRD_PARTY_LICENSES.txt` for full license information.
 
 ## Contact
 
-**Developer**: [Your Name]
-- 💼 LinkedIn: [Your LinkedIn URL]
-- 🐙 GitHub: [@yourusername](https://github.com/yourusername)
-- 📧 Email: your.email@example.com
+**Developer**: Aravindhan Rajasekaran
+Current Role: Lead Test Engineer @ Acumatica (2020-Present)
+Experience: 10+ years in QA, Test Automation, and Software Development
+Expertise: C#, Java, Python, Selenium, API Testing, CI/CD
+Certifications: ISTQB Certified, Certified Scrum Master
+GitHub: @arvindhanqa
+LinkedIn: linkedin.com/in/aravindrajsekar
+Location: Saskatoon, Saskatchewan, Canada
 
 ## Acknowledgments
 
