@@ -54,7 +54,7 @@ public partial class SprintPRsViewModel : ObservableObject
             await _prService.AddPRAsync(
                 CurrentSprint.Id,
                 dialog.PRTitle,
-                null, // link
+                dialog.Link,
                 dialog.Author,
                 dialog.Priority);
             await LoadDataAsync();

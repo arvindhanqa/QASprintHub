@@ -14,6 +14,7 @@ public partial class AddPRDialog : Window
 
     public string PRTitle => TitleTextBox.Text;
     public string Author => AuthorTextBox.Text;
+    public string? Link => string.IsNullOrWhiteSpace(LinkTextBox.Text) ? null : LinkTextBox.Text;
 
     public PRStatus Status
     {
