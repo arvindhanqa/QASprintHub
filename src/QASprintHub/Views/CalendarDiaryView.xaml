@@ -32,8 +32,12 @@
                 <!-- Sprint Title and Watcher -->
                 <StackPanel Grid.Row="0">
                     <TextBlock Text="{Binding SprintTitle}" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="{Binding WatcherName, StringFormat='🛡️ QA Watcher: {0}'}"
-                              FontSize="16" Foreground="#ECF0F1" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="{Binding WatcherName, StringFormat='🛡️ QA Watcher: {0}'}"
+                                  FontSize="16" Foreground="#ECF0F1"/>
+                        <TextBlock Text=" (swapped)" FontSize="14" Foreground="Orange" Margin="10,0,0,0"
+                                   Visibility="{Binding IsWatcherSwapped, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
                     <TextBlock Text="{Binding BackupWatcherName, StringFormat='👤 Backup: {0}'}"
                               FontSize="14" Foreground="#BDC3C7" Margin="0,3,0,0"
                               Visibility="{Binding BackupWatcherName, Converter={StaticResource StringToVisibilityConverter}}"/>

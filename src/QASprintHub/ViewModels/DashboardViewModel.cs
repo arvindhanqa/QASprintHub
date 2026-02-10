@@ -49,6 +49,9 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private int _totalDays;
 
+    [ObservableProperty]
+    private bool _isWatcherSwapped;
+
     public DashboardViewModel(
         ISprintService sprintService,
         IPRService prService,
@@ -69,6 +72,10 @@ public partial class DashboardViewModel : ObservableObject
         {
             CurrentWatcher = CurrentSprint.Watcher;
             CurrentBackup = await _watcherService.GetActiveBackupWatcherAsync(CurrentSprint.Id);
+
+            // Check if watcher was swapped
+            var swap = await _watcherService.GetSwapForSprintAsync(CurrentSprint.Id);
+            IsWatcherSwapped = swap != null;
 
             // Load PR stats
             var stats = await _prService.GetPRStatsBySprintIdAsync(CurrentSprint.Id);
@@ -137,6 +144,68 @@ public partial class DashboardViewModel : ObservableObject
         {
             await _watcherService.RemoveBackupWatcherAsync(CurrentBackup.Id);
             await LoadDataAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task PreviousSprintAsync()
+    {
+        if (CurrentSprint == null) return;
+
+        var previousSprint = await _sprintService.GetPreviousSprintAsync(CurrentSprint.Id);
+        if (previousSprint != null)
+        {
+            // Load data for the previous sprint by temporarily setting it as current
+            await LoadSprintDataAsync(previousSprint);
+        }
+    }
+
+    [RelayCommand]
+    private async Task NextSprintAsync()
+    {
+        if (CurrentSprint == null) return;
+
+        var nextSprint = await _sprintService.GetNextSprintAsync(CurrentSprint.Id);
+        if (nextSprint != null)
+        {
+            // Load data for the next sprint
+            await LoadSprintDataAsync(nextSprint);
+        }
+    }
+
+    [RelayCommand]
+    private async Task GoToCurrentSprintAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadSprintDataAsync(Sprint sprint)
+    {
+        CurrentSprint = sprint;
+        CurrentWatcher = sprint.Watcher;
+        CurrentBackup = await _watcherService.GetActiveBackupWatcherAsync(sprint.Id);
+
+        // Check if watcher was swapped
+        var swap = await _watcherService.GetSwapForSprintAsync(sprint.Id);
+        IsWatcherSwapped = swap != null;
+
+        // Load PR stats
+        var stats = await _prService.GetPRStatsBySprintIdAsync(sprint.Id);
+        TotalPRs = stats.Values.Sum();
+        PendingPRs = stats[Models.Enums.PRStatus.Pending];
+        MergedPRs = stats[Models.Enums.PRStatus.Merged];
+        BlockedPRs = stats[Models.Enums.PRStatus.Blocked];
+
+        // Calculate current day and total days
+        var today = DateTime.Today;
+        CurrentDay = (today - sprint.StartDate).Days + 1;
+        TotalDays = (sprint.EndDate - sprint.StartDate).Days + 1;
+
+        // Load next sprint info
+        NextSprint = await _sprintService.GetNextSprintAsync(sprint.Id);
+        if (NextSprint != null)
+        {
+            NextWatcher = NextSprint.Watcher;
         }
     }
 }

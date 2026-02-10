@@ -122,6 +122,32 @@ public class SprintService : ISprintService
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Sprint?> GetPreviousSprintAsync(int sprintId)
+    {
+        var currentSprint = await GetSprintByIdAsync(sprintId);
+        if (currentSprint == null) return null;
+
+        return await _context.Sprints
+            .Include(s => s.Watcher)
+            .Include(s => s.BackupWatchers).ThenInclude(b => b.BackupMember)
+            .Where(s => s.StartDate < currentSprint.StartDate)
+            .OrderByDescending(s => s.StartDate)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Sprint?> GetNextSprintAsync(int sprintId)
+    {
+        var currentSprint = await GetSprintByIdAsync(sprintId);
+        if (currentSprint == null) return null;
+
+        return await _context.Sprints
+            .Include(s => s.Watcher)
+            .Include(s => s.BackupWatchers).ThenInclude(b => b.BackupMember)
+            .Where(s => s.StartDate > currentSprint.StartDate)
+            .OrderBy(s => s.StartDate)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<int> GetNextWatcherIdAsync()
     {
         var activeMembers = await _teamService.GetActiveMembersAsync();

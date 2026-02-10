@@ -28,10 +28,23 @@
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-            <TextBlock Text="{Binding CurrentSprint.DisplayName, StringFormat='Sprint PRs — {0}'}"
-                       FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
-            <ui:Button Content="+ Add PR" Command="{Binding AddPRCommand}" Margin="0,0,10,0"/>
+        <StackPanel Grid.Row="0" Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Content="◄◄ Previous Sprint" Command="{Binding PreviousSprintCommand}"
+                       Padding="8,4" Margin="0,0,10,0" Background="#34495E" Foreground="White"
+                       BorderBrush="#7F8C8D"/>
+                <Button Content="Current Sprint" Command="{Binding GoToCurrentSprintCommand}"
+                       Padding="8,4" Margin="0,0,10,0" Background="#3498DB" Foreground="White"
+                       BorderBrush="#2980B9"/>
+                <Button Content="Next Sprint ►►" Command="{Binding NextSprintCommand}"
+                       Padding="8,4" Background="#34495E" Foreground="White"
+                       BorderBrush="#7F8C8D"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentSprint.DisplayName, StringFormat='Sprint PRs — {0}'}"
+                           FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                <ui:Button Content="+ Add PR" Command="{Binding AddPRCommand}" Margin="0,0,10,0"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- PR List -->
