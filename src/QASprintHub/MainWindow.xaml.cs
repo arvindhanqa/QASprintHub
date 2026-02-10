@@ -167,10 +167,13 @@ public partial class MainWindow : Window
         UpdateMonthDisplay();
     }
 
-    private void Today_Click(object sender, RoutedEventArgs e)
+    private async void Today_Click(object sender, RoutedEventArgs e)
     {
         _currentMonth = DateTime.Today;
         UpdateMonthDisplay();
+
+        // Navigate to Calendar Diary view and go to today's date
+        await NavigateToDateAsync(DateTime.Today);
     }
 
     private void UpdateMonthDisplay()
@@ -187,12 +190,26 @@ public partial class MainWindow : Window
             _currentMonth = selectedDate;
             UpdateMonthDisplay();
 
-            // If we're on the Calendar Diary view, navigate to the selected date
-            if (ContentFrame.Content is CalendarDiaryView calendarView &&
-                calendarView.DataContext is CalendarDiaryViewModel viewModel)
-            {
-                await viewModel.GoToDateAsync(selectedDate);
-            }
+            // Navigate to the selected date's sprint in Calendar Diary view
+            await NavigateToDateAsync(selectedDate);
+        }
+    }
+
+    private async System.Threading.Tasks.Task NavigateToDateAsync(DateTime date)
+    {
+        // Ensure we're on the Calendar Diary view
+        if (!(ContentFrame.Content is CalendarDiaryView))
+        {
+            NavigateTo("CalendarDiary");
+            // Wait a moment for the navigation to complete
+            await System.Threading.Tasks.Task.Delay(100);
+        }
+
+        // Navigate to the specified date's sprint
+        if (ContentFrame.Content is CalendarDiaryView calendarView &&
+            calendarView.DataContext is CalendarDiaryViewModel viewModel)
+        {
+            await viewModel.GoToDateAsync(date);
         }
     }
 
