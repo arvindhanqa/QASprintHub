@@ -74,17 +74,31 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        // Add global exception handler for unhandled exceptions
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        DispatcherUnhandledException += App_DispatcherUnhandledException;
+
         // Single instance check
         bool createdNew;
         _instanceMutex = new Mutex(true, "QASprintHub_SingleInstanceMutex", out createdNew);
 
         if (!createdNew)
         {
-            // Another instance is already running
-            MessageBox.Show("QA Sprint Hub is already running. Check the system tray.",
-                "Already Running",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            // Another instance is already running - try to show the existing window
+            try
+            {
+                // Signal the existing instance to show its window using a named event
+                using var showEvent = new System.Threading.EventWaitHandle(false, System.Threading.EventResetMode.AutoReset, "QASprintHub_ShowWindowEvent");
+                showEvent.Set();
+            }
+            catch
+            {
+                // If signaling fails, show a message
+                MessageBox.Show("QA Sprint Hub is already running. Check the system tray.",
+                    "Already Running",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
             Shutdown();
             return;
         }
@@ -192,6 +206,38 @@ public partial class App : Application
             System.Windows.MessageBox.Show($"Error showing main window: {ex.Message}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
 
+        // Listen for signal from other instances trying to launch
+        var showWindowThread = new System.Threading.Thread(() =>
+        {
+            try
+            {
+                using var showEvent = new System.Threading.EventWaitHandle(false, System.Threading.EventResetMode.AutoReset, "QASprintHub_ShowWindowEvent");
+                while (true)
+                {
+                    showEvent.WaitOne();
+                    // Signal received - show the main window
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        try
+                        {
+                            mainWindow.Show();
+                            mainWindow.Activate();
+                            if (mainWindow.WindowState == WindowState.Minimized)
+                            {
+                                mainWindow.WindowState = WindowState.Normal;
+                            }
+                        }
+                        catch { }
+                    }));
+                }
+            }
+            catch { }
+        })
+        {
+            IsBackground = true
+        };
+        showWindowThread.Start();
+
         base.OnStartup(e);
 
         // Save data on system shutdown/session end
@@ -245,5 +291,39 @@ public partial class App : Application
         }
 
         return service;
+    }
+
+    private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        LogException(e.ExceptionObject as Exception, "Unhandled Exception");
+    }
+
+    private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        LogException(e.Exception, "Dispatcher Exception");
+        e.Handled = true; // Prevent app crash
+
+        MessageBox.Show($"An error occurred: {e.Exception.Message}\n\nCheck the log file in %APPDATA%\\QASprintHub\\error.log for details.",
+            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private void LogException(Exception? ex, string context)
+    {
+        if (ex == null) return;
+
+        try
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var logDirectory = Path.Combine(appDataPath, "QASprintHub");
+            Directory.CreateDirectory(logDirectory);
+            var logPath = Path.Combine(logDirectory, "error.log");
+
+            var logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {context}\n{ex}\n\n";
+            File.AppendAllText(logPath, logMessage);
+        }
+        catch
+        {
+            // Can't log - ignore
+        }
     }
 }

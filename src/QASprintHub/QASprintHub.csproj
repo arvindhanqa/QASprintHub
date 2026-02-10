@@ -55,9 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\app-icon.ico">
+    <Resource Include="Assets\app-icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
 
 </Project>
