@@ -12,21 +12,18 @@ public partial class MainWindow : Window
     private readonly IServiceProvider _serviceProvider;
     private readonly ITrayService _trayService;
     private readonly INotificationService _notificationService;
-    private readonly ISprintService _sprintService;
     private DateTime _currentMonth;
 
     public MainWindow(
         IServiceProvider serviceProvider,
         ITrayService trayService,
-        INotificationService notificationService,
-        ISprintService sprintService)
+        INotificationService notificationService)
     {
         InitializeComponent();
 
         _serviceProvider = serviceProvider;
         _trayService = trayService;
         _notificationService = notificationService;
-        _sprintService = sprintService;
 
         _currentMonth = DateTime.Today;
         UpdateMonthDisplay();
@@ -77,10 +74,11 @@ public partial class MainWindow : Window
     {
         try
         {
-            var currentSprint = await _sprintService.GetCurrentSprintAsync();
+            var sprintService = _serviceProvider.GetRequiredService<ISprintService>();
+            var currentSprint = await sprintService.GetCurrentSprintAsync();
             if (currentSprint != null)
             {
-                var nextSprint = await _sprintService.GetNextSprintAsync();
+                var nextSprint = await sprintService.GetNextSprintAsync();
                 _notificationService.ShowWatcherNotification(currentSprint, nextSprint?.Watcher);
 
                 // Update tray icon with current watcher
@@ -201,8 +199,9 @@ public partial class MainWindow : Window
     private async void NotificationBell_Click(object sender, RoutedEventArgs e)
     {
         // Get current and next sprint info
-        var currentSprint = await _sprintService.GetCurrentSprintAsync();
-        var nextSprint = await _sprintService.GetNextSprintAsync();
+        var sprintService = _serviceProvider.GetRequiredService<ISprintService>();
+        var currentSprint = await sprintService.GetCurrentSprintAsync();
+        var nextSprint = await sprintService.GetNextSprintAsync();
 
         var message = "📋 Notifications:\n\n";
 
