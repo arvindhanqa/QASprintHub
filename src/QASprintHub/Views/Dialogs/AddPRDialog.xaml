@@ -4,7 +4,8 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:enums="clr-namespace:QASprintHub.Models.Enums"
         Title="Add Pull Request"
-        Height="520" Width="500"
+        SizeToContent="Height" Width="500"
+        MaxHeight="600"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         Background="White">
@@ -16,7 +17,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -64,7 +64,7 @@
         </StackPanel>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <ui:Button Content="Cancel" Appearance="Secondary" Click="Cancel_Click" Margin="0,0,10,0" Padding="20,8"/>
             <ui:Button Content="Add" Appearance="Primary" Click="OK_Click" Padding="20,8"/>
         </StackPanel>
