@@ -79,7 +79,7 @@ public partial class CalendarDiaryViewModel : ObservableObject
 
             // Load backup watcher
             var backupWatcher = await _watcherService.GetActiveBackupWatcherAsync(CurrentSprint.Id);
-            BackupWatcherName = backupWatcher?.TeamMember?.Name ?? string.Empty;
+            BackupWatcherName = backupWatcher?.BackupMember?.Name ?? string.Empty;
 
             // Check if watcher was swapped
             var swap = await _watcherService.GetSwapForSprintAsync(CurrentSprint.Id);
