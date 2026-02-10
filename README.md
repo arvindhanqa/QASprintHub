@@ -405,13 +405,13 @@ See `THIRD_PARTY_LICENSES.txt` for full license information.
 ## Contact
 
 **Developer**: Aravindhan Rajasekaran
-Current Role: Lead Test Engineer @ Acumatica (2020-Present)
-Experience: 10+ years in QA, Test Automation, and Software Development
-Expertise: C#, Java, Python, Selenium, API Testing, CI/CD
-Certifications: ISTQB Certified, Certified Scrum Master
-GitHub: @arvindhanqa
-LinkedIn: linkedin.com/in/aravindrajsekar
-Location: Saskatoon, Saskatchewan, Canada
+ -  Current Role: Lead Test Engineer @ Acumatica (2020-Present)
+ -  Experience: 10+ years in QA, Test Automation, and Software Development
+ -  Expertise: C#, Java, Python, Selenium, API Testing, CI/CD
+ -  Certifications: ISTQB Certified, Certified Scrum Master
+ -  GitHub: @arvindhanqa
+ -  LinkedIn: linkedin.com/in/aravindrajsekar
+ -  Location: Saskatoon, Saskatchewan, Canada
 
 ## Acknowledgments
 
