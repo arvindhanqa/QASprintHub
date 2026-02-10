@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using QASprintHub.Models;
 using QASprintHub.Models.Enums;
 using QASprintHub.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,8 +66,20 @@ public partial class SprintPRsViewModel : ObservableObject
     private async Task EditPRAsync(SprintPR? pr)
     {
         if (pr == null) return;
-        // TODO: Open edit PR dialog
-        await Task.CompletedTask;
+
+        var dialog = new Views.Dialogs.EditPRDialog(pr);
+        if (dialog.ShowDialog() == true)
+        {
+            // Update the PR with the edited values
+            pr.Title = dialog.PRTitle;
+            pr.Author = dialog.Author;
+            pr.Link = dialog.Link;
+            pr.Status = dialog.Status;
+            pr.Priority = dialog.Priority;
+
+            await _prService.UpdatePRAsync(pr);
+            await LoadDataAsync();
+        }
     }
 
     [RelayCommand]
@@ -89,13 +102,34 @@ public partial class SprintPRsViewModel : ObservableObject
     [RelayCommand]
     private void OpenLink(SprintPR? pr)
     {
-        if (pr?.Link != null)
+        if (string.IsNullOrWhiteSpace(pr?.Link))
+        {
+            System.Windows.MessageBox.Show("No link available for this PR.", "Open Link",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            return;
+        }
+
+        // Validate URL format
+        if (!Uri.TryCreate(pr.Link, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            System.Windows.MessageBox.Show("Invalid URL format. Please enter a valid http or https URL.",
+                "Invalid Link", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
+        try
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = pr.Link,
                 UseShellExecute = true
             });
+        }
+        catch (System.Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Failed to open link: {ex.Message}", "Error",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
