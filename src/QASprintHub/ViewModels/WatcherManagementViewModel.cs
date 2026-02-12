@@ -91,35 +91,49 @@ public partial class WatcherManagementViewModel : ObservableObject
     private async Task MoveUpAsync(TeamMember? member)
     {
         var target = member ?? SelectedMember;
-        if (target == null || target.RotationOrder <= 1) return;
+        if (target == null) return;
 
         var members = ActiveMembers.OrderBy(m => m.RotationOrder).ToList();
         var index = members.FindIndex(m => m.Id == target.Id);
-        if (index > 0)
-        {
-            var upper = members[index - 1];
-            var current = members[index];
-            var tmp = upper.RotationOrder;
-            upper.RotationOrder = current.RotationOrder;
-            current.RotationOrder = tmp;
 
-            await _teamService.ReorderMembersAsync(members.Select(m => m.Id).ToList());
-            await LoadDataAsync();
-        }
+        if (index <= 0) return; // Can't move up if already at the top
+
+        // Swap the rotation orders
+        var upper = members[index - 1];
+        var current = members[index];
+        var tempOrder = upper.RotationOrder;
+        upper.RotationOrder = current.RotationOrder;
+        current.RotationOrder = tempOrder;
+
+        // Update in database
+        await _teamService.UpdateMemberAsync(upper);
+        await _teamService.UpdateMemberAsync(current);
+
+        await LoadDataAsync();
     }
 
     [RelayCommand]
     private async Task MoveDownAsync(TeamMember? member)
     {
-        if (member == null) return;
+        var target = member ?? SelectedMember;
+        if (target == null) return;
 
         var members = ActiveMembers.OrderBy(m => m.RotationOrder).ToList();
-        var index = members.IndexOf(member);
-        if (index < members.Count - 1)
-        {
-            (members[index], members[index + 1]) = (members[index + 1], members[index]);
-            await _teamService.ReorderMembersAsync(members.Select(m => m.Id).ToList());
-            await LoadDataAsync();
-        }
+        var index = members.FindIndex(m => m.Id == target.Id);
+
+        if (index < 0 || index >= members.Count - 1) return; // Can't move down if at the bottom
+
+        // Swap the rotation orders
+        var current = members[index];
+        var lower = members[index + 1];
+        var tempOrder = current.RotationOrder;
+        current.RotationOrder = lower.RotationOrder;
+        lower.RotationOrder = tempOrder;
+
+        // Update in database
+        await _teamService.UpdateMemberAsync(current);
+        await _teamService.UpdateMemberAsync(lower);
+
+        await LoadDataAsync();
     }
 }
